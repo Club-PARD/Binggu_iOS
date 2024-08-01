@@ -1,13 +1,5 @@
-# Created by https://www.toptal.com/developers/gitignore/api/swift,xcode,cocoapods
-# Edit at https://www.toptal.com/developers/gitignore?templates=swift,xcode,cocoapods
-
-### CocoaPods ###
-## CocoaPods GitIgnore Template
-
-# CocoaPods - Only use to conserve bandwidth / Save time on Pushing
-#           - Also handy if you have a large number of dependant pods
-#           - AS PER https://guides.cocoapods.org/using/using-cocoapods.html NEVER IGNORE THE LOCK FILE
-Pods/
+# Created by https://www.toptal.com/developers/gitignore/api/xcode,swift
+# Edit at https://www.toptal.com/developers/gitignore?templates=xcode,swift
 
 ### Swift ###
 # Xcode
@@ -105,7 +97,8 @@ iOSInjectionProject/
 !*.xcworkspace/contents.xcworkspacedata
 /*.gcno
 **/xcshareddata/WorkspaceSettings.xcsettings
+*.xcconfig
 
-.DS_Store
+**/.DS_Store
 
-# End of https://www.toptal.com/developers/gitignore/api/swift,xcode,cocoapods
+# End of https://www.toptal.com/developers/gitignore/api/xcode,swift
