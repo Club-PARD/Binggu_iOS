@@ -10,6 +10,11 @@ import UIKit
 class MainViewController: UIViewController {
     var frequentRoutes: [FrequentRoute] = []
     
+    var departurePlaceholder = "출발지 입력"
+    var arrivePlaceholder = "도착지 입력"
+    var departureValue: String?
+    var arriveValue: String?
+    
     let topview : UIView = {
         let top = UIView()
         top.translatesAutoresizingMaskIntoConstraints = false
@@ -124,55 +129,27 @@ class MainViewController: UIViewController {
     }()
     
     // 출발지 입력칸
-    let departureButton: UIButton = {
-        var configuration = UIButton.Configuration.plain()
-        
-        configuration.background.backgroundColor = .clear
-        
-        // 플레이스홀더 텍스트 설정
-        configuration.attributedTitle = AttributedString("출발지 입력", attributes: AttributeContainer([
-            .font: UIFont.nanumSquareNeo(.regular, size: 22),
-            .foregroundColor: UIColor.lightGray
-        ]))
-        
-        configuration.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
-        configuration.titleAlignment = .leading
-        
-        let button = UIButton(configuration: configuration)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        
-        button.contentVerticalAlignment = .bottom
-        button.contentHorizontalAlignment = .leading
-        
-        button.addTarget(self, action: #selector(departureLabelTapped), for: .touchUpInside)
-        
-        return button
+    let departureLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.nanumSquareNeo(.regular, size: 22)
+        label.textColor = .lightGray
+        label.numberOfLines = 1
+        label.lineBreakMode = .byTruncatingTail
+        label.isUserInteractionEnabled = true
+        return label
     }()
 
     // 도착지 입력칸
-    let arriveButton: UIButton = {
-        var configuration = UIButton.Configuration.plain()
-        
-        configuration.background.backgroundColor = .clear
-        
-        // 플레이스홀더 텍스트 설정
-        configuration.attributedTitle = AttributedString("도착지 입력", attributes: AttributeContainer([
-            .font: UIFont.nanumSquareNeo(.regular, size: 22),
-            .foregroundColor: UIColor.lightGray
-        ]))
-        
-        configuration.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
-        configuration.titleAlignment = .leading
-        
-        let button = UIButton(configuration: configuration)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        
-        button.contentVerticalAlignment = .bottom
-        button.contentHorizontalAlignment = .leading
-        
-        button.addTarget(self, action: #selector(arriveLabelTapped), for: .touchUpInside)
-        
-        return button
+    let arriveLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.nanumSquareNeo(.regular, size: 22)
+        label.textColor = .lightGray
+        label.numberOfLines = 1
+        label.lineBreakMode = .byTruncatingTail
+        label.isUserInteractionEnabled = true
+        return label
     }()
     
     let frequentRoutesLabel: UILabel = {
@@ -203,7 +180,7 @@ class MainViewController: UIViewController {
         
         return button
     }()
-    
+    //즐겨찾기 값 뜨는 collectionview
     lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
@@ -216,7 +193,7 @@ class MainViewController: UIViewController {
         cv.dataSource = self
         return cv
     }()
-// 등록된 값 없을 때 나타나는 곳
+// 즐겨찾기 등록된 값 없을 때 나타나는 곳
     let emptyStateView: UIView = {
            let view = UIView()
            view.translatesAutoresizingMaskIntoConstraints = false
@@ -260,10 +237,35 @@ class MainViewController: UIViewController {
         imageView.contentMode = .scaleAspectFit
         return imageView
     }()
+//    출발, 도착 값이 다 담기면 나타나는 부분
+    let recommendedRouteView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = .white
+        view.isHidden = true // 초기에는 숨김 상태
+        return view
+    }()
+
+    let recommendedRouteLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.text = "추천하는 길"
+        label.font = UIFont.nanumSquareNeo(.extraBold, size: 20)
+        label.textColor = .black
+        return label
+    }()
+
+    let recommendedRouteTableView: UITableView = {
+        let tableView = UITableView()
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "RecommendedRouteCell")
+        return tableView
+    }()
+    
     
     @objc func departureLabelTapped() {
         let modalVC = DepartureModalViewController()
-        //        modalVC.delegate = self
+        modalVC.delegate = self
         modalVC.modalPresentationStyle = .formSheet
         
         // detent 설정
@@ -284,7 +286,7 @@ class MainViewController: UIViewController {
     
     @objc func arriveLabelTapped() {
         let modalVC = ArriveModalViewController()
-        //        modalVC.delegate = self
+        modalVC.delegate = self
         modalVC.modalPresentationStyle = .formSheet
         
         // detent 설정
@@ -303,8 +305,74 @@ class MainViewController: UIViewController {
         }
     }
     
+    func updateDepartureLabel() {
+        if let value = departureValue, !value.isEmpty {
+            departureLabel.text = value
+            departureLabel.font = UIFont.nanumSquareNeo(.bold, size: 18)
+            departureLabel.textColor = .black
+        } else {
+            departureLabel.text = departurePlaceholder
+            departureLabel.font = UIFont.nanumSquareNeo(.regular, size: 22)
+            departureLabel.textColor = .lightGray
+        }
+        updateRecommendedRouteView()
+    }
+
+    func updateArriveLabel() {
+        if let value = arriveValue, !value.isEmpty {
+            arriveLabel.text = value
+            arriveLabel.font = UIFont.nanumSquareNeo(.bold, size: 18)
+            arriveLabel.textColor = .black
+        } else {
+            arriveLabel.text = arrivePlaceholder
+            arriveLabel.font = UIFont.nanumSquareNeo(.regular, size: 22)
+            arriveLabel.textColor = .lightGray
+        }
+        updateRecommendedRouteView()
+    }
+    //출발, 도착 두 값이 모두 있는지 확인해서 있으면 이 함수 실행
+    func updateRecommendedRouteView() {
+        if let departure = departureValue, let arrive = arriveValue,
+           !departure.isEmpty && !arrive.isEmpty {
+            recommendedRouteView.isHidden = false
+            bottomview.isHidden = true
+        } else {
+            recommendedRouteView.isHidden = true
+            bottomview.isHidden = false
+        }
+    }
+
+    func swapDepartureAndArriveValues() {
+        let tempDeparture = departureValue
+        let tempArrive = arriveValue
+        
+        // 출발지 값이 있고 도착지 값이 없는 경우
+        if tempDeparture != nil && tempArrive == nil {
+            departureValue = nil
+            arriveValue = tempDeparture
+        }
+        // 도착지 값이 있고 출발지 값이 없는 경우
+        else if tempArrive != nil && tempDeparture == nil {
+            departureValue = tempArrive
+            arriveValue = nil
+        }
+        // 둘 다 값이 있는 경우
+        else if tempDeparture != nil && tempArrive != nil {
+            departureValue = tempArrive
+            arriveValue = tempDeparture
+        }
+        // 둘 다 값이 없는 경우는 아무 것도 하지 않음
+        
+        DispatchQueue.main.async { [weak self] in
+            self?.updateDepartureLabel()
+            self?.updateArriveLabel()
+        }
+    }
+    
+    
     @objc func changeButtonTapped() {
         print("button tapped")
+        swapDepartureAndArriveValues()
     }
     
     @objc func editbuttontaped() {
@@ -335,9 +403,22 @@ class MainViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = UIColor(red: 0.968, green: 0.968, blue: 0.968, alpha: 1)
 
+        
+        recommendedRouteTableView.delegate = self
+        recommendedRouteTableView.dataSource = self
+        
         setUI()
         updateEmptyState()
         fetchFrequentRoutes()
+        
+        updateDepartureLabel()
+        updateArriveLabel()
+        
+        let departureTapGesture = UITapGestureRecognizer(target: self, action: #selector(departureLabelTapped))
+        departureLabel.addGestureRecognizer(departureTapGesture)
+        
+        let arriveTapGesture = UITapGestureRecognizer(target: self, action: #selector(arriveLabelTapped))
+        arriveLabel.addGestureRecognizer(arriveTapGesture)
     }
     
     func setUI() {
@@ -345,8 +426,8 @@ class MainViewController: UIViewController {
         view.addSubview(bottomview)
         view.addSubview(searchview)
         searchview.addSubview(line)
-        searchview.addSubview(departureButton)
-        searchview.addSubview(arriveButton)
+        searchview.addSubview(departureLabel)
+        searchview.addSubview(arriveLabel)
         searchview.addSubview(barimage)
         topview.addSubview(logoimage)
         topview.addSubview(titlelabel)
@@ -359,6 +440,9 @@ class MainViewController: UIViewController {
         emptyStateView.addSubview(emptyStateLabel)
         emptyStateView.addSubview(emptyStateLabel2)
         emptyStateView.addSubview(emptyStateImageView)
+        view.addSubview(recommendedRouteView)
+        recommendedRouteView.addSubview(recommendedRouteLabel)
+        recommendedRouteView.addSubview(recommendedRouteTableView)
         
         NSLayoutConstraint.activate([
             topview.topAnchor.constraint(equalTo: view.topAnchor),
@@ -397,13 +481,14 @@ class MainViewController: UIViewController {
             line.trailingAnchor.constraint(equalTo: searchview.trailingAnchor, constant: -22),
             line.heightAnchor.constraint(equalToConstant: 2),
             
-            departureButton.bottomAnchor.constraint(equalTo: line.topAnchor, constant: -22),
-            departureButton.leadingAnchor.constraint(equalTo: line.leadingAnchor),
-            departureButton.trailingAnchor.constraint(equalTo: searchview.trailingAnchor, constant: -75),
+            departureLabel.bottomAnchor.constraint(equalTo: line.topAnchor, constant: -22),
+            departureLabel.leadingAnchor.constraint(equalTo: line.leadingAnchor),
+            departureLabel.trailingAnchor.constraint(equalTo: searchview.trailingAnchor, constant: -75),
+            departureLabel.heightAnchor.constraint(equalToConstant: 22),
             
-            arriveButton.topAnchor.constraint(equalTo: line.bottomAnchor, constant: 22),
-            arriveButton.leadingAnchor.constraint(equalTo: line.leadingAnchor),
-            arriveButton.trailingAnchor.constraint(equalTo: searchview.trailingAnchor, constant: -75),
+            arriveLabel.topAnchor.constraint(equalTo: line.bottomAnchor, constant: 22),
+            arriveLabel.leadingAnchor.constraint(equalTo: line.leadingAnchor),
+            arriveLabel.trailingAnchor.constraint(equalTo: searchview.trailingAnchor, constant: -75),
             
             changeButton.centerYAnchor.constraint(equalTo: line.centerYAnchor),
             changeButton.trailingAnchor.constraint(equalTo: searchview.trailingAnchor, constant: -35),
@@ -429,7 +514,20 @@ class MainViewController: UIViewController {
             emptyStateLabel2.centerXAnchor.constraint(equalTo: emptyStateView.centerXAnchor),
 
             emptyStateImageView.centerXAnchor.constraint(equalTo: emptyStateView.centerXAnchor),
-            emptyStateImageView.heightAnchor.constraint(equalToConstant: 55)
+            emptyStateImageView.heightAnchor.constraint(equalToConstant: 55),
+            
+            recommendedRouteView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            recommendedRouteView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            recommendedRouteView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            recommendedRouteView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.5),
+
+            recommendedRouteLabel.topAnchor.constraint(equalTo: recommendedRouteView.topAnchor, constant: 10),
+            recommendedRouteLabel.leadingAnchor.constraint(equalTo: recommendedRouteView.leadingAnchor, constant: 30),
+
+            recommendedRouteTableView.topAnchor.constraint(equalTo: recommendedRouteView.topAnchor, constant: 60),
+            recommendedRouteTableView.leadingAnchor.constraint(equalTo: recommendedRouteView.leadingAnchor),
+            recommendedRouteTableView.trailingAnchor.constraint(equalTo: recommendedRouteView.trailingAnchor),
+            recommendedRouteTableView.bottomAnchor.constraint(equalTo: recommendedRouteView.bottomAnchor)
         ])
     }
     func updateEmptyState() {
@@ -438,7 +536,7 @@ class MainViewController: UIViewController {
     }
 }
 
-
+// 즐겨찾기 collectionview관리
 extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return frequentRoutes.count
@@ -458,7 +556,6 @@ extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSour
         cell.layer.masksToBounds = true // cell 자체에도 설정
 
         return cell
-
     }
 
     // MARK: - UICollectionViewDelegateFlowLayout
@@ -473,6 +570,37 @@ extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSour
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         return 12 // 가로 간격
+    }
+}
+// 출발, 도착 값 있을 떄 따는 tableview 관리
+extension MainViewController: UITableViewDelegate, UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 5 // 예시로 5개의 셀을 표시
+    }
+
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "RecommendedRouteCell", for: indexPath)
+        cell.textLabel?.text = "추천 경로 \(indexPath.row + 1)"
+        return cell
+    }
+}
+
+
+
+//delegate 프로토콜 채택 및 구현
+extension MainViewController: DepartureModalViewControllerDelegate {
+    func departureModalViewController(_ viewController: DepartureModalViewController, didSelectAddress address: String) {
+        departureLabel.text = address
+        departureValue = address
+        updateDepartureLabel()
+    }
+}
+
+extension MainViewController: ArriveModalViewControllerDelegate {
+    func arriveModalViewController(_ viewController: ArriveModalViewController, didSelectAddress address: String) {
+        arriveLabel.text = address
+        arriveValue = address
+        updateArriveLabel()
     }
 }
 

@@ -27,6 +27,7 @@
 		8179B2342C5D755E005D8BE7 /* ArriveModalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8179B2332C5D755E005D8BE7 /* ArriveModalViewController.swift */; };
 		8179B2362C5DFF27005D8BE7 /* FrequentRouteCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8179B2352C5DFF27005D8BE7 /* FrequentRouteCell.swift */; };
 		8179B2382C5E0F8E005D8BE7 /* EditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8179B2372C5E0F8E005D8BE7 /* EditViewController.swift */; };
+		8179B23A2C5E733A005D8BE7 /* AddressTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8179B2392C5E733A005D8BE7 /* AddressTableViewCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -71,6 +72,7 @@
 		8179B2332C5D755E005D8BE7 /* ArriveModalViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArriveModalViewController.swift; sourceTree = "<group>"; };
 		8179B2352C5DFF27005D8BE7 /* FrequentRouteCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrequentRouteCell.swift; sourceTree = "<group>"; };
 		8179B2372C5E0F8E005D8BE7 /* EditViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditViewController.swift; sourceTree = "<group>"; };
+		8179B2392C5E733A005D8BE7 /* AddressTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AddressTableViewCell.swift; path = ../../../../../../.Trash/Binggu_iOS/WheelBus/WheelBus/ViewControllers/main/AddressTableViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -165,6 +167,7 @@
 			children = (
 				8179B1F32C5CF2E3005D8BE7 /* LoadingViewController.swift */,
 				8179B2312C5D2C17005D8BE7 /* DepartureModalViewController.swift */,
+				8179B2392C5E733A005D8BE7 /* AddressTableViewCell.swift */,
 				8179B2332C5D755E005D8BE7 /* ArriveModalViewController.swift */,
 				8179B2352C5DFF27005D8BE7 /* FrequentRouteCell.swift */,
 				8179B2372C5E0F8E005D8BE7 /* EditViewController.swift */,
@@ -322,6 +325,7 @@
 			files = (
 				22BDCFD52C5B727300EF6205 /* MainViewController.swift in Sources */,
 				22BDCFD12C5B727300EF6205 /* AppDelegate.swift in Sources */,
+				8179B23A2C5E733A005D8BE7 /* AddressTableViewCell.swift in Sources */,
 				8179B2302C5D170C005D8BE7 /* UIFont.swift in Sources */,
 				8179B2362C5DFF27005D8BE7 /* FrequentRouteCell.swift in Sources */,
 				8179B2322C5D2C17005D8BE7 /* DepartureModalViewController.swift in Sources */,
