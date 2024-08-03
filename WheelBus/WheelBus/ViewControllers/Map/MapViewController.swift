@@ -77,7 +77,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         view.addSubview(routeWalkthroughView)
         
         NSLayoutConstraint.activate([
-            routeWalkthroughView.topAnchor.constraint(equalTo: mapView.bottomAnchor, constant: 27),
+            routeWalkthroughView.topAnchor.constraint(equalTo: mapView.bottomAnchor),
             routeWalkthroughView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             routeWalkthroughView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             routeWalkthroughView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
