@@ -7,6 +7,7 @@
 //
 import UIKit
 import MapKit
+import CoreLocation
 
 protocol DepartureModalViewControllerDelegate: AnyObject {
     func departureModalViewController(_ viewController: DepartureModalViewController, didSelectAddress address: String)
@@ -19,9 +20,35 @@ class DepartureModalViewController: UIViewController, UISearchBarDelegate, MKLoc
     private var searchResults: [MKLocalSearchCompletion] = []
     private let resultsTableView = UITableView()
     private var searchWorkItem: DispatchWorkItem?
+    
+    private let locationManager = CLLocationManager()
+    
+    private lazy var myLocationButton: UIButton = {
+        var configuration = UIButton.Configuration.filled()
+        configuration.title = "내위치"
+        configuration.baseBackgroundColor = .white
 
-    
-    
+        var titleAttributes = AttributeContainer()
+           titleAttributes.font = UIFont.nanumSquareNeo(.bold, size: 14) // 원하는 폰트와 크기로 설정
+           titleAttributes.foregroundColor = #colorLiteral(red: 0.3123708963, green: 0.567548573, blue: 1, alpha: 1)
+           
+        configuration.attributedTitle = AttributedString("내위치", attributes: titleAttributes)
+
+        // 이미지 추가
+        let image = UIImage(named: "gps")  // 원하는 이미지를 시스템 이미지로 설정
+        configuration.image = image
+        configuration.imagePadding = 1
+
+        let button = UIButton(configuration: configuration)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(myLocationButtonTapped), for: .touchUpInside)
+        button.layer.cornerRadius = 17
+        button.layer.borderColor = #colorLiteral(red: 0.3123708963, green: 0.567548573, blue: 1, alpha: 1)
+        button.layer.borderWidth = 1
+        
+        return button
+    }()
+        
     let search: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -104,6 +131,7 @@ class DepartureModalViewController: UIViewController, UISearchBarDelegate, MKLoc
         view.backgroundColor = .white
         setupUI()
         setupSearchCompleter()
+        setupLocationManager()  //내 위치 찾는 함수
         searchBar.delegate = self
     }
     
@@ -124,6 +152,16 @@ class DepartureModalViewController: UIViewController, UISearchBarDelegate, MKLoc
         searchCompleter.region = region
     }
     
+    private func setupLocationManager() {
+         locationManager.delegate = self
+         locationManager.desiredAccuracy = kCLLocationAccuracyBest
+     }
+    
+    @objc private func myLocationButtonTapped() {
+        locationManager.requestWhenInUseAuthorization()
+        locationManager.requestLocation()
+    }
+    
     func setupUI() {
         resultsTableView.dataSource = self
         resultsTableView.delegate = self
@@ -140,6 +178,7 @@ class DepartureModalViewController: UIViewController, UISearchBarDelegate, MKLoc
         view.addSubview(line)
         view.addSubview(resultsTableView)
         view.addSubview(shortline)
+        view.addSubview(myLocationButton)
         
         NSLayoutConstraint.activate([
             searchBar.topAnchor.constraint(equalTo: search.bottomAnchor, constant: 27),
@@ -168,7 +207,12 @@ class DepartureModalViewController: UIViewController, UISearchBarDelegate, MKLoc
             shortline.topAnchor.constraint(equalTo: view.topAnchor, constant: 26),
             shortline.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             shortline.widthAnchor.constraint(equalToConstant: 78),
-            shortline.heightAnchor.constraint(equalToConstant: 5)
+            shortline.heightAnchor.constraint(equalToConstant: 5),
+            
+            myLocationButton.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 10),
+            myLocationButton.trailingAnchor.constraint(equalTo: searchBar.trailingAnchor),
+            myLocationButton.widthAnchor.constraint(equalToConstant: 85),
+            myLocationButton.heightAnchor.constraint(equalToConstant: 36)
         ])
     }
     
@@ -215,7 +259,6 @@ class DepartureModalViewController: UIViewController, UISearchBarDelegate, MKLoc
             // 단일 검색어인 경우
             searchCompleter.queryFragment = searchText
         }
-        
         resultsTableView.isHidden = false
         resultsTableView.reloadData()
     }
@@ -274,3 +317,43 @@ extension DepartureModalViewController: UITableViewDataSource, UITableViewDelega
     }
 }
     
+extension DepartureModalViewController: CLLocationManagerDelegate {
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+            guard let location = locations.last else { return }
+            
+            let geocoder = CLGeocoder()
+            geocoder.reverseGeocodeLocation(location) { [weak self] placemarks, error in
+                guard let self = self, let placemark = placemarks?.first else { return }
+                
+                let address = self.formatAddress(from: placemark)
+                self.delegate?.departureModalViewController(self, didSelectAddress: address)
+                self.dismiss(animated: true, completion: nil)
+            }
+        }
+
+        func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+            print("Location error: \(error.localizedDescription)")
+        }
+
+        private func formatAddress(from placemark: CLPlacemark) -> String {
+            var addressComponents: [String] = []
+            
+            if let thoroughfare = placemark.thoroughfare {
+                addressComponents.append(thoroughfare)
+            }
+            if let subThoroughfare = placemark.subThoroughfare {
+                addressComponents.append(subThoroughfare)
+            }
+            if let locality = placemark.locality {
+                addressComponents.append(locality)
+            }
+            if let subLocality = placemark.subLocality {
+                addressComponents.append(subLocality)
+            }
+            if let administrativeArea = placemark.administrativeArea {
+                addressComponents.append(administrativeArea)
+            }
+            
+            return addressComponents.joined(separator: " ")
+        }
+}

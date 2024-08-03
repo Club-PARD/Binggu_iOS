@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CoreLocation
 
 class MainViewController: UIViewController {
     var frequentRoutes: [FrequentRoute] = []
@@ -14,6 +15,41 @@ class MainViewController: UIViewController {
     var arrivePlaceholder = "도착지 입력"
     var departureValue: String?
     var arriveValue: String?
+    
+    var departureLat: Float = 0.0
+    var departureLon: Float = 0.0
+    var arriveLat: Float = 0.0
+    var arriveLon: Float = 0.0
+    
+    func convertAddressToCoordinates(address: String, isArrival: Bool) {
+        let geocoder = CLGeocoder()
+        
+        geocoder.geocodeAddressString(address) { [weak self] (placemarks, error) in
+            guard let self = self else { return }
+            
+            if let error = error {
+                print("Geocoding error: \(error.localizedDescription)")
+                return
+            }
+            
+            guard let placemark = placemarks?.first,
+                  let location = placemark.location else {
+                print("No coordinates found for the address")
+                return
+            }
+            
+            if isArrival {
+                self.arriveLat = Float(location.coordinate.latitude)
+                self.arriveLon = Float(location.coordinate.longitude)
+                print("Arrival Coordinates: \(self.arriveLat), \(self.arriveLon)")
+            } else {
+                self.departureLat = Float(location.coordinate.latitude)
+                self.departureLon = Float(location.coordinate.longitude)
+                print("Departure Coordinates: \(self.departureLat), \(self.departureLon)")
+            }
+        }        
+    }
+
     
     let topview : UIView = {
         let top = UIView()
@@ -336,6 +372,9 @@ class MainViewController: UIViewController {
            !departure.isEmpty && !arrive.isEmpty {
             recommendedRouteView.isHidden = false
             bottomview.isHidden = true
+            // 둘 다 값 들어있으면 이걸로 위도 경도 받아오기
+            convertAddressToCoordinates(address: departureValue!, isArrival: false)
+            convertAddressToCoordinates(address: arriveValue!, isArrival: true)
         } else {
             recommendedRouteView.isHidden = true
             bottomview.isHidden = false
