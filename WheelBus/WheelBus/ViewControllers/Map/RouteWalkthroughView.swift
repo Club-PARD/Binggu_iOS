@@ -317,7 +317,7 @@ class RouteWalkthroughView: UIScrollView {
         segmentStack.axis = .horizontal
         segmentStack.alignment = .center
         segmentStack.distribution = .fill
-        segmentStack.spacing = -10 // 조정 가능: 세그먼트 간 간격 (음수 값으로 겹침 조절)
+        segmentStack.spacing = -10
         segmentStack.translatesAutoresizingMaskIntoConstraints = false
         container.addSubview(segmentStack)
 
@@ -352,11 +352,9 @@ class RouteWalkthroughView: UIScrollView {
             busIcon.trailingAnchor.constraint(equalTo: busSegment.leadingAnchor, constant: overlapAmount)
         ])
 
-        // Set content hugging priority to ensure icons don't stretch
         wheelWalkIcon.setContentHuggingPriority(.required, for: .horizontal)
         busIcon.setContentHuggingPriority(.required, for: .horizontal)
 
-        // Set the segment widths based on the duration ratio
         let segments = [walkSegment1, busSegment, walkSegment2]
         for segment in segments {
             let duration = segment.tag
@@ -380,11 +378,11 @@ class RouteWalkthroughView: UIScrollView {
         let lineView = UIView()
         lineView.translatesAutoresizingMaskIntoConstraints = false
         lineView.layer.masksToBounds = true
-        lineView.layer.cornerRadius = 7.83 // 조정 가능: 선의 모서리 둥글기
+        lineView.layer.cornerRadius = 7.83
         
         let durationLabel = UILabel()
         durationLabel.translatesAutoresizingMaskIntoConstraints = false
-        durationLabel.font = UIFont.systemFont(ofSize: 9) // 조정 가능: 글꼴 크기
+        durationLabel.font = UIFont.systemFont(ofSize: 9)
         durationLabel.text = "\(duration)분"
         durationLabel.textAlignment = .center
 
@@ -393,17 +391,17 @@ class RouteWalkthroughView: UIScrollView {
 
         switch type {
         case .walk:
-            lineView.backgroundColor = UIColor(red: 0.943, green: 0.943, blue: 0.943, alpha: 1) // 조정 가능: 걷기 선 색상
-            durationLabel.textColor = UIColor(red: 0.62, green: 0.62, blue: 0.62, alpha: 1) // 조정 가능: 걷기 텍스트 색상
+            lineView.backgroundColor = UIColor(red: 0.943, green: 0.943, blue: 0.943, alpha: 1)
+            durationLabel.textColor = UIColor(red: 0.62, green: 0.62, blue: 0.62, alpha: 1)
         case .bus:
-            lineView.backgroundColor = UIColor(red: 0.25, green: 0.475, blue: 1, alpha: 1) // 조정 가능: 버스 선 색상
-            durationLabel.textColor = .white // 조정 가능: 버스 텍스트 색상
+            lineView.backgroundColor = UIColor(red: 0.25, green: 0.475, blue: 1, alpha: 1)
+            durationLabel.textColor = .white
         }
 
         NSLayoutConstraint.activate([
             segmentView.heightAnchor.constraint(equalToConstant: 24),
 
-            lineView.heightAnchor.constraint(equalToConstant: 15.66), // 조정 가능: 선의 높이
+            lineView.heightAnchor.constraint(equalToConstant: 15.66),
             lineView.centerYAnchor.constraint(equalTo: segmentView.centerYAnchor),
             lineView.leadingAnchor.constraint(equalTo: segmentView.leadingAnchor),
             lineView.trailingAnchor.constraint(equalTo: segmentView.trailingAnchor),
