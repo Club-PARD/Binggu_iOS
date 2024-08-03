@@ -2,6 +2,14 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>UIAppFonts</key>
+	<array>
+		<string>NanumSquareNeo-Light.otf</string>
+		<string>NanumSquareNeo-Regular.otf</string>
+		<string>NanumSquareNeo-Bold.otf</string>
+		<string>NanumSquareNeo-ExtraBold.otf</string>
+		<string>NanumSquareNeo-Heavy.otf</string>
+	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
