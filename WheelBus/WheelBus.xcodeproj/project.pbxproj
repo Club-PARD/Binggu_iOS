@@ -18,6 +18,7 @@
 		22BDCFF42C5B727E00EF6205 /* WheelBusUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22BDCFF32C5B727E00EF6205 /* WheelBusUITestsLaunchTests.swift */; };
 		B3787EBF2C5D075D00C3F1A5 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3787EBE2C5D075D00C3F1A5 /* MapViewController.swift */; };
 		B3787EC12C5D1EE700C3F1A5 /* RouteWalkthroughView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3787EC02C5D1EE700C3F1A5 /* RouteWalkthroughView.swift */; };
+		B381386B2C5E27B900801E06 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B381386A2C5E27B900801E06 /* NetworkManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,6 +54,7 @@
 		22BDCFF32C5B727E00EF6205 /* WheelBusUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WheelBusUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		B3787EBE2C5D075D00C3F1A5 /* MapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
 		B3787EC02C5D1EE700C3F1A5 /* RouteWalkthroughView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteWalkthroughView.swift; sourceTree = "<group>"; };
+		B381386A2C5E27B900801E06 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -145,6 +147,7 @@
 			children = (
 				B3787EBE2C5D075D00C3F1A5 /* MapViewController.swift */,
 				B3787EC02C5D1EE700C3F1A5 /* RouteWalkthroughView.swift */,
+				B381386A2C5E27B900801E06 /* NetworkManager.swift */,
 			);
 			path = Map;
 			sourceTree = "<group>";
@@ -280,6 +283,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B381386B2C5E27B900801E06 /* NetworkManager.swift in Sources */,
 				22BDCFD52C5B727300EF6205 /* MainViewController.swift in Sources */,
 				22BDCFD12C5B727300EF6205 /* AppDelegate.swift in Sources */,
 				22BDCFD32C5B727300EF6205 /* SceneDelegate.swift in Sources */,

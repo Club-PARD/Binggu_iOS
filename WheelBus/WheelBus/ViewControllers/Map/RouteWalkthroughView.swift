@@ -2,6 +2,7 @@ import UIKit
 
 class RouteWalkthroughView: UIScrollView {
     private let contentView = UIView()
+    private let minSegmentWidth: CGFloat = 40
     
     private let totalTimeLabel: UILabel = {
         let label = UILabel()
@@ -16,21 +17,8 @@ class RouteWalkthroughView: UIScrollView {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = UIColor(red: 0.098, green: 0.098, blue: 0.098, alpha: 1)
-        
-        let fullString = NSMutableAttributedString(string: "25분")
-        
-        let numberAttributes: [NSAttributedString.Key: Any] = [
-            .font: UIFont(name: "NotoSansKR-Medium", size: 32) ?? UIFont.systemFont(ofSize: 32)
-        ]
-        fullString.addAttributes(numberAttributes, range: NSRange(location: 0, length: 2))
-        
-        let unitAttributes: [NSAttributedString.Key: Any] = [
-            .font: UIFont(name: "NotoSansKR-Medium", size: 16) ?? UIFont.systemFont(ofSize: 16)
-        ]
-        fullString.addAttributes(unitAttributes, range: NSRange(location: 2, length: 1))
-        
-        label.attributedText = fullString
-        
+        label.font = UIFont(name: "NotoSansKR-Medium", size: 32) ?? UIFont.systemFont(ofSize: 32)
+        label.text = ""
         return label
     }()
     
@@ -47,13 +35,13 @@ class RouteWalkthroughView: UIScrollView {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .black
         label.font = UIFont(name: "NanumSquareNeo-Bold", size: 12)
-        label.text = "휠워크 13분"
+        label.text = "휠워크"
         label.adjustsFontSizeToFitWidth = true
         label.minimumScaleFactor = 0.5
         return label
     }()
     
-    private let routeStackView: UIStackView = {
+    private var routeStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
         stackView.alignment = .center
@@ -107,10 +95,7 @@ class RouteWalkthroughView: UIScrollView {
         label.textColor = UIColor(red: 0, green: 0.3, blue: 1, alpha: 1)
         label.font = UIFont(name: "NanumSquareNeo-ExtraBold", size: 22)
         label.textAlignment = .center
-        
-        let paragraphStyle = NSMutableParagraphStyle()
-        label.attributedText = NSAttributedString(string: "206", attributes: [.paragraphStyle: paragraphStyle])
-        
+        label.text = ""
         return label
     }()
 
@@ -119,10 +104,7 @@ class RouteWalkthroughView: UIScrollView {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = UIColor(red: 0.098, green: 0.098, blue: 0.098, alpha: 1)
         label.font = UIFont(name: "NanumSquareNeo-Bold", size: 18)
-        
-        let paragraphStyle = NSMutableParagraphStyle()
-        label.attributedText = NSAttributedString(string: "스타벅스 포항양덕점...", attributes: [.paragraphStyle: paragraphStyle])
-        
+        label.text = ""
         return label
     }()
 
@@ -302,39 +284,18 @@ class RouteWalkthroughView: UIScrollView {
             shapeLayer.path = path
         }
     }
-    
     private func setupRouteView() {
-        let walkDuration1 = 6
-        let busDuration = 12
-        let walkDuration2 = 7
-        let totalDuration = walkDuration1 + busDuration + walkDuration2
-
         let container = UIView()
         container.translatesAutoresizingMaskIntoConstraints = false
         addSubview(container)
 
-        let segmentStack = UIStackView()
-        segmentStack.axis = .horizontal
-        segmentStack.alignment = .center
-        segmentStack.distribution = .fill
-        segmentStack.spacing = -10
-        segmentStack.translatesAutoresizingMaskIntoConstraints = false
-        container.addSubview(segmentStack)
-
-        let wheelWalkIcon = createTransportIcon(named: "WheelWalk")
-        let walkSegment1 = createRouteSegment(type: .walk, duration: walkDuration1, totalDuration: totalDuration)
-        let busIcon = createTransportIcon(named: "MapBus")
-        let busSegment = createRouteSegment(type: .bus, duration: busDuration, totalDuration: totalDuration)
-        let walkSegment2 = createRouteSegment(type: .walk, duration: walkDuration2, totalDuration: totalDuration)
-
-        // 조정 가능: 아이콘과 세그먼트의 겹침 정도
-        let overlapAmount: CGFloat = 10
-
-        segmentStack.addArrangedSubview(wheelWalkIcon)
-        segmentStack.addArrangedSubview(walkSegment1)
-        segmentStack.addArrangedSubview(busIcon)
-        segmentStack.addArrangedSubview(busSegment)
-        segmentStack.addArrangedSubview(walkSegment2)
+        routeStackView = UIStackView()
+        routeStackView.axis = .horizontal
+        routeStackView.alignment = .center
+        routeStackView.distribution = .fill
+        routeStackView.spacing = -10
+        routeStackView.translatesAutoresizingMaskIntoConstraints = false
+        container.addSubview(routeStackView)
 
         NSLayoutConstraint.activate([
             container.topAnchor.constraint(equalTo: timeLabel.bottomAnchor, constant: 23.34),
@@ -342,79 +303,111 @@ class RouteWalkthroughView: UIScrollView {
             container.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -30.5),
             container.heightAnchor.constraint(equalToConstant: 24),
 
-            segmentStack.topAnchor.constraint(equalTo: container.topAnchor),
-            segmentStack.bottomAnchor.constraint(equalTo: container.bottomAnchor),
-            segmentStack.leadingAnchor.constraint(equalTo: container.leadingAnchor),
-            segmentStack.trailingAnchor.constraint(equalTo: container.trailingAnchor),
-
-            // 아이콘과 세그먼트 겹침 설정
-            wheelWalkIcon.trailingAnchor.constraint(equalTo: walkSegment1.leadingAnchor, constant: overlapAmount),
-            busIcon.trailingAnchor.constraint(equalTo: busSegment.leadingAnchor, constant: overlapAmount)
+            routeStackView.topAnchor.constraint(equalTo: container.topAnchor),
+            routeStackView.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+            routeStackView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            routeStackView.trailingAnchor.constraint(equalTo: container.trailingAnchor)
         ])
-
-        wheelWalkIcon.setContentHuggingPriority(.required, for: .horizontal)
-        busIcon.setContentHuggingPriority(.required, for: .horizontal)
-
-        let segments = [walkSegment1, busSegment, walkSegment2]
-        for segment in segments {
-            let duration = segment.tag
-            let widthConstraint = segment.widthAnchor.constraint(equalTo: segmentStack.widthAnchor, multiplier: CGFloat(duration) / CGFloat(totalDuration))
-            widthConstraint.priority = .defaultHigh
-            widthConstraint.isActive = true
-        }
-
-        // zIndex 설정
-        walkSegment2.layer.zPosition = 1
-        busSegment.layer.zPosition = 2
-        walkSegment1.layer.zPosition = 3
-        wheelWalkIcon.layer.zPosition = 4
-        busIcon.layer.zPosition = 4
     }
 
-    private func createRouteSegment(type: RouteSegmentType, duration: Int, totalDuration: Int) -> UIView {
-        let segmentView = UIView()
-        segmentView.translatesAutoresizingMaskIntoConstraints = false
+    private func setupRouteSegments(firstWalkTime: Int, busTime: Int, finalWalkTime: Int) {
+          routeStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+          
+          let totalDuration = firstWalkTime + busTime + finalWalkTime
+          let overlapAmount: CGFloat = 10
 
-        let lineView = UIView()
-        lineView.translatesAutoresizingMaskIntoConstraints = false
-        lineView.layer.masksToBounds = true
-        lineView.layer.cornerRadius = 7.83
-        
-        let durationLabel = UILabel()
-        durationLabel.translatesAutoresizingMaskIntoConstraints = false
-        durationLabel.font = UIFont.systemFont(ofSize: 9)
-        durationLabel.text = "\(duration)분"
-        durationLabel.textAlignment = .center
+          let wheelWalkIcon = createTransportIcon(named: "WheelWalk")
+          let walkSegment1 = createRouteSegment(type: .walk, duration: firstWalkTime, totalDuration: totalDuration)
+          let busIcon = createTransportIcon(named: "MapBus")
+          let busSegment = createRouteSegment(type: .bus, duration: busTime, totalDuration: totalDuration)
+          let walkSegment2 = createRouteSegment(type: .walk, duration: finalWalkTime, totalDuration: totalDuration)
 
-        segmentView.addSubview(lineView)
-        segmentView.addSubview(durationLabel)
+          routeStackView.addArrangedSubview(wheelWalkIcon)
+          routeStackView.addArrangedSubview(walkSegment1)
+          routeStackView.addArrangedSubview(busIcon)
+          routeStackView.addArrangedSubview(busSegment)
+          routeStackView.addArrangedSubview(walkSegment2)
 
-        switch type {
-        case .walk:
-            lineView.backgroundColor = UIColor(red: 0.943, green: 0.943, blue: 0.943, alpha: 1)
-            durationLabel.textColor = UIColor(red: 0.62, green: 0.62, blue: 0.62, alpha: 1)
-        case .bus:
-            lineView.backgroundColor = UIColor(red: 0.25, green: 0.475, blue: 1, alpha: 1)
-            durationLabel.textColor = .white
-        }
+          wheelWalkIcon.setContentHuggingPriority(.required, for: .horizontal)
+          busIcon.setContentHuggingPriority(.required, for: .horizontal)
 
-        NSLayoutConstraint.activate([
-            segmentView.heightAnchor.constraint(equalToConstant: 24),
+          NSLayoutConstraint.activate([
+              wheelWalkIcon.trailingAnchor.constraint(equalTo: walkSegment1.leadingAnchor, constant: overlapAmount),
+              busIcon.trailingAnchor.constraint(equalTo: busSegment.leadingAnchor, constant: overlapAmount)
+          ])
 
-            lineView.heightAnchor.constraint(equalToConstant: 15.66),
-            lineView.centerYAnchor.constraint(equalTo: segmentView.centerYAnchor),
-            lineView.leadingAnchor.constraint(equalTo: segmentView.leadingAnchor),
-            lineView.trailingAnchor.constraint(equalTo: segmentView.trailingAnchor),
+          let segments = [walkSegment1, busSegment, walkSegment2]
+          let durations = [firstWalkTime, busTime, finalWalkTime]
+          
+          let logDurations = durations.map { log(Double($0) + 1) }
+          let totalLogDuration = logDurations.reduce(0, +)
+          
+          for (index, segment) in segments.enumerated() {
+              let logDuration = logDurations[index]
+              let widthMultiplier = CGFloat(logDuration / totalLogDuration)
+              
+              let widthConstraint = segment.widthAnchor.constraint(greaterThanOrEqualTo: routeStackView.widthAnchor, multiplier: widthMultiplier)
+              widthConstraint.priority = .defaultHigh
+              widthConstraint.isActive = true
+              
+              segment.widthAnchor.constraint(greaterThanOrEqualToConstant: minSegmentWidth).isActive = true
+          }
 
-            durationLabel.centerXAnchor.constraint(equalTo: lineView.centerXAnchor),
-            durationLabel.centerYAnchor.constraint(equalTo: lineView.centerYAnchor)
-        ])
+          walkSegment2.layer.zPosition = 1
+          busSegment.layer.zPosition = 2
+          walkSegment1.layer.zPosition = 3
+          wheelWalkIcon.layer.zPosition = 4
+          busIcon.layer.zPosition = 4
+      }
 
-        segmentView.setContentHuggingPriority(.defaultLow, for: .horizontal)
-        segmentView.tag = duration
+      private func createRouteSegment(type: RouteSegmentType, duration: Int, totalDuration: Int) -> UIView {
+          let segmentView = UIView()
+          segmentView.translatesAutoresizingMaskIntoConstraints = false
 
-        return segmentView
-    }
+          let lineView = UIView()
+          lineView.translatesAutoresizingMaskIntoConstraints = false
+          lineView.layer.masksToBounds = true
+          lineView.layer.cornerRadius = 7.83
+          
+          let durationLabel = UILabel()
+          durationLabel.translatesAutoresizingMaskIntoConstraints = false
+          durationLabel.font = UIFont.systemFont(ofSize: 9)
+          durationLabel.text = "\(duration)분"
+          durationLabel.textAlignment = .center
+          durationLabel.adjustsFontSizeToFitWidth = true
+          durationLabel.minimumScaleFactor = 0.5
+
+          segmentView.addSubview(lineView)
+          segmentView.addSubview(durationLabel)
+
+          switch type {
+          case .walk:
+              lineView.backgroundColor = UIColor(red: 0.943, green: 0.943, blue: 0.943, alpha: 1)
+              durationLabel.textColor = UIColor(red: 0.62, green: 0.62, blue: 0.62, alpha: 1)
+          case .bus:
+              lineView.backgroundColor = UIColor(red: 0.25, green: 0.475, blue: 1, alpha: 1)
+              durationLabel.textColor = .white
+          }
+
+          NSLayoutConstraint.activate([
+              segmentView.heightAnchor.constraint(equalToConstant: 24),
+
+              lineView.heightAnchor.constraint(equalToConstant: 15.66),
+              lineView.centerYAnchor.constraint(equalTo: segmentView.centerYAnchor),
+              lineView.leadingAnchor.constraint(equalTo: segmentView.leadingAnchor),
+              lineView.trailingAnchor.constraint(equalTo: segmentView.trailingAnchor),
+
+              durationLabel.centerXAnchor.constraint(equalTo: lineView.centerXAnchor),
+              durationLabel.centerYAnchor.constraint(equalTo: lineView.centerYAnchor),
+              durationLabel.leadingAnchor.constraint(greaterThanOrEqualTo: lineView.leadingAnchor, constant: 2),
+              durationLabel.trailingAnchor.constraint(lessThanOrEqualTo: lineView.trailingAnchor, constant: -2)
+          ])
+
+          segmentView.setContentHuggingPriority(.defaultLow, for: .horizontal)
+          segmentView.tag = duration
+
+          return segmentView
+      }
 
     private func createTransportIcon(named: String) -> UIImageView {
         let imageView = UIImageView(image: UIImage(named: named))
@@ -427,7 +420,7 @@ class RouteWalkthroughView: UIScrollView {
         return imageView
     }
     
-    func updateTotalTime(_ time: Int) {
+    private func updateTotalTime(_ time: Int) {
         let fullString = NSMutableAttributedString(string: "\(time)분")
         
         let numberAttributes: [NSAttributedString.Key: Any] = [
@@ -443,18 +436,21 @@ class RouteWalkthroughView: UIScrollView {
         timeLabel.attributedText = fullString
     }
     
-    func updateWheelWalkTime(_ time: Int) {
+    private func updateWheelWalkTime(_ time: Int) {
         wheelWalkTimeLabel.text = "휠워크 \(time)분"
     }
     
     func updateBusNumber(_ number: String) {
-        let paragraphStyle = NSMutableParagraphStyle()
-        busNumberLabel.attributedText = NSAttributedString(string: number, attributes: [.paragraphStyle: paragraphStyle])
+        busNumberLabel.text = number
     }
 
     func updateBusStopName(_ name: String) {
         let paragraphStyle = NSMutableParagraphStyle()
         busStopNameLabel.attributedText = NSAttributedString(string: name, attributes: [.paragraphStyle: paragraphStyle])
+    }
+    
+    func setContentVisible(_ isVisible: Bool) {
+        self.alpha = isVisible ? 1.0 : 0.0
     }
     
     func updateDestination(_ destination: String) {
@@ -463,6 +459,34 @@ class RouteWalkthroughView: UIScrollView {
         destinationLabel.attributedText = NSAttributedString(string: destination, attributes: [.paragraphStyle: paragraphStyle])
     }
     
+    func updateRouteSegments(firstWalkTime: Int, busTime: Int, finalWalkTime: Int) {
+        let subviews = routeStackView.arrangedSubviews
+        if subviews.count >= 5,
+           let walkSegment1 = subviews[1] as? UIView,
+           let busSegment = subviews[3] as? UIView,
+           let walkSegment2 = subviews[4] as? UIView {
+            
+            updateSegmentTime(segment: walkSegment1, time: firstWalkTime)
+            updateSegmentTime(segment: busSegment, time: busTime)
+            updateSegmentTime(segment: walkSegment2, time: finalWalkTime)
+        } else {
+            print("Unexpected routeStackView structure. Subview count: \(subviews.count)")
+        }
+    }
+
+    private func updateSegmentTime(segment: UIView, time: Int) {
+        if let durationLabel = segment.subviews.first(where: { $0 is UILabel }) as? UILabel {
+            durationLabel.text = "\(time)분"
+        }
+    }
+    
+    func setupRouteInfo(totalTime: Int, wheelWalkTime: Int, firstWalkTime: Int, busTime: Int, finalWalkTime: Int, busNumber: String) {
+        updateTotalTime(totalTime)
+        updateWheelWalkTime(wheelWalkTime)
+        setupRouteSegments(firstWalkTime: firstWalkTime, busTime: busTime, finalWalkTime: finalWalkTime)
+        updateBusNumber(busNumber)
+        setContentVisible(true)
+    }
     override func layoutSubviews() {
         super.layoutSubviews()
         updateDottedLinePath(for: grayDottedLine)
