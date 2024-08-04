@@ -29,6 +29,13 @@
 		8179B2382C5E0F8E005D8BE7 /* EditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8179B2372C5E0F8E005D8BE7 /* EditViewController.swift */; };
 		8179B23A2C5E733A005D8BE7 /* AddressTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8179B2392C5E733A005D8BE7 /* AddressTableViewCell.swift */; };
 		8179B23C2C5F53D3005D8BE7 /* FrequentEditCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8179B23B2C5F53D3005D8BE7 /* FrequentEditCell.swift */; };
+		8179B23E2C5F7CEB005D8BE7 /* RouteRecommendCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8179B23D2C5F7CEB005D8BE7 /* RouteRecommendCell.swift */; };
+		8179B2452C5FB582005D8BE7 /* NotoSansKR-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 8179B23F2C5FB582005D8BE7 /* NotoSansKR-Medium.otf */; };
+		8179B2462C5FB582005D8BE7 /* NotoSansKR-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 8179B2402C5FB582005D8BE7 /* NotoSansKR-Regular.otf */; };
+		8179B2472C5FB582005D8BE7 /* NotoSansKR-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = 8179B2412C5FB582005D8BE7 /* NotoSansKR-Light.otf */; };
+		8179B2482C5FB582005D8BE7 /* NotoSansKR-Thin.otf in Resources */ = {isa = PBXBuildFile; fileRef = 8179B2422C5FB582005D8BE7 /* NotoSansKR-Thin.otf */; };
+		8179B2492C5FB582005D8BE7 /* NotoSansKR-Black.otf in Resources */ = {isa = PBXBuildFile; fileRef = 8179B2432C5FB582005D8BE7 /* NotoSansKR-Black.otf */; };
+		8179B24A2C5FB582005D8BE7 /* NotoSansKR-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 8179B2442C5FB582005D8BE7 /* NotoSansKR-Bold.otf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -75,6 +82,13 @@
 		8179B2372C5E0F8E005D8BE7 /* EditViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditViewController.swift; sourceTree = "<group>"; };
 		8179B2392C5E733A005D8BE7 /* AddressTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AddressTableViewCell.swift; path = ../../../../../../.Trash/Binggu_iOS/WheelBus/WheelBus/ViewControllers/main/AddressTableViewCell.swift; sourceTree = "<group>"; };
 		8179B23B2C5F53D3005D8BE7 /* FrequentEditCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrequentEditCell.swift; sourceTree = "<group>"; };
+		8179B23D2C5F7CEB005D8BE7 /* RouteRecommendCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteRecommendCell.swift; sourceTree = "<group>"; };
+		8179B23F2C5FB582005D8BE7 /* NotoSansKR-Medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NotoSansKR-Medium.otf"; sourceTree = "<group>"; };
+		8179B2402C5FB582005D8BE7 /* NotoSansKR-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NotoSansKR-Regular.otf"; sourceTree = "<group>"; };
+		8179B2412C5FB582005D8BE7 /* NotoSansKR-Light.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NotoSansKR-Light.otf"; sourceTree = "<group>"; };
+		8179B2422C5FB582005D8BE7 /* NotoSansKR-Thin.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NotoSansKR-Thin.otf"; sourceTree = "<group>"; };
+		8179B2432C5FB582005D8BE7 /* NotoSansKR-Black.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NotoSansKR-Black.otf"; sourceTree = "<group>"; };
+		8179B2442C5FB582005D8BE7 /* NotoSansKR-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NotoSansKR-Bold.otf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -174,6 +188,7 @@
 				8179B2352C5DFF27005D8BE7 /* FrequentRouteCell.swift */,
 				8179B23B2C5F53D3005D8BE7 /* FrequentEditCell.swift */,
 				8179B2372C5E0F8E005D8BE7 /* EditViewController.swift */,
+				8179B23D2C5F7CEB005D8BE7 /* RouteRecommendCell.swift */,
 			);
 			path = main;
 			sourceTree = "<group>";
@@ -181,6 +196,12 @@
 		8179B1F52C5D0A0E005D8BE7 /* Fonts */ = {
 			isa = PBXGroup;
 			children = (
+				8179B2432C5FB582005D8BE7 /* NotoSansKR-Black.otf */,
+				8179B2442C5FB582005D8BE7 /* NotoSansKR-Bold.otf */,
+				8179B2412C5FB582005D8BE7 /* NotoSansKR-Light.otf */,
+				8179B23F2C5FB582005D8BE7 /* NotoSansKR-Medium.otf */,
+				8179B2402C5FB582005D8BE7 /* NotoSansKR-Regular.otf */,
+				8179B2422C5FB582005D8BE7 /* NotoSansKR-Thin.otf */,
 				8179B2242C5D0F41005D8BE7 /* NanumSquareNeo-Bold.otf */,
 				8179B2262C5D0F41005D8BE7 /* NanumSquareNeo-ExtraBold.otf */,
 				8179B2232C5D0F41005D8BE7 /* NanumSquareNeo-Heavy.otf */,
@@ -294,10 +315,16 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8179B2482C5FB582005D8BE7 /* NotoSansKR-Thin.otf in Resources */,
 				8179B22B2C5D0F41005D8BE7 /* NanumSquareNeo-ExtraBold.otf in Resources */,
 				22BDCFDA2C5B727D00EF6205 /* Assets.xcassets in Resources */,
 				8179B2292C5D0F41005D8BE7 /* NanumSquareNeo-Bold.otf in Resources */,
+				8179B2452C5FB582005D8BE7 /* NotoSansKR-Medium.otf in Resources */,
+				8179B2492C5FB582005D8BE7 /* NotoSansKR-Black.otf in Resources */,
+				8179B2462C5FB582005D8BE7 /* NotoSansKR-Regular.otf in Resources */,
 				22BDCFDD2C5B727D00EF6205 /* Base in Resources */,
+				8179B24A2C5FB582005D8BE7 /* NotoSansKR-Bold.otf in Resources */,
+				8179B2472C5FB582005D8BE7 /* NotoSansKR-Light.otf in Resources */,
 				22BDCFD82C5B727300EF6205 /* Base in Resources */,
 				8179B22A2C5D0F41005D8BE7 /* NanumSquareNeo-Regular.otf in Resources */,
 				8179B22C2C5D0F41005D8BE7 /* NanumSquareNeo-Light.otf in Resources */,
@@ -334,6 +361,7 @@
 				8179B2322C5D2C17005D8BE7 /* DepartureModalViewController.swift in Sources */,
 				8179B23C2C5F53D3005D8BE7 /* FrequentEditCell.swift in Sources */,
 				8179B2342C5D755E005D8BE7 /* ArriveModalViewController.swift in Sources */,
+				8179B23E2C5F7CEB005D8BE7 /* RouteRecommendCell.swift in Sources */,
 				22BDCFD32C5B727300EF6205 /* SceneDelegate.swift in Sources */,
 				8179B1F42C5CF2E3005D8BE7 /* LoadingViewController.swift in Sources */,
 				8179B2382C5E0F8E005D8BE7 /* EditViewController.swift in Sources */,

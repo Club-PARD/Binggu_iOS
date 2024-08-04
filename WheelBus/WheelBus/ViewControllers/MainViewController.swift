@@ -8,7 +8,9 @@
 import UIKit
 import CoreLocation
 
-class MainViewController: UIViewController {
+class MainViewController: UIViewController, EditViewControllerDelegate {
+    var userId: Int64?
+    
     var frequentRoutes: [FrequentRoute] = []
     
     var departurePlaceholder = "출발지 입력"
@@ -49,7 +51,7 @@ class MainViewController: UIViewController {
             }
         }
     }
-
+    
     
     let topview : UIView = {
         let top = UIView()
@@ -103,10 +105,10 @@ class MainViewController: UIViewController {
         // 줄 간격 설정
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.lineSpacing = 10 // 원하는 줄 간격으로 조절
-          
+        
         // 전체 텍스트에 줄 간격 적용
         attributedText.addAttribute(.paragraphStyle, value: paragraphStyle, range: NSMakeRange(0, attributedText.length))
-          
+        
         // UILabel에 속성 텍스트 설정
         label.attributedText = attributedText
         label.textColor = .white
@@ -125,7 +127,7 @@ class MainViewController: UIViewController {
         search.layer.shadowRadius = 20
         search.layer.masksToBounds = false //view 경계 넘는 부분 자르지 않게 해주기. 이렇게 해야 그림자 보임
         return search
-        }()
+    }()
     
     let barimage : UIImageView = {
         let imageView = UIImageView()
@@ -160,7 +162,7 @@ class MainViewController: UIViewController {
         let button  = UIButton(configuration: config)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(changeButtonTapped), for: .touchUpInside)
-
+        
         return button
     }()
     
@@ -175,7 +177,7 @@ class MainViewController: UIViewController {
         label.isUserInteractionEnabled = true
         return label
     }()
-
+    
     // 도착지 입력칸
     let arriveLabel: UILabel = {
         let label = UILabel()
@@ -189,12 +191,12 @@ class MainViewController: UIViewController {
     }()
     
     let frequentRoutesLabel: UILabel = {
-            let label = UILabel()
-            label.translatesAutoresizingMaskIntoConstraints = false
-            label.text = "자주 가는 길"
-            label.font = UIFont.nanumSquareNeo(.extraBold, size: 20)
-            label.textColor = .black
-            return label
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.text = "자주 가는 길"
+        label.font = UIFont.nanumSquareNeo(.extraBold, size: 20)
+        label.textColor = .black
+        return label
     }()
     
     let editbutton : UIButton = {
@@ -229,43 +231,43 @@ class MainViewController: UIViewController {
         cv.dataSource = self
         return cv
     }()
-// 즐겨찾기 등록된 값 없을 때 나타나는 곳
+    // 즐겨찾기 등록된 값 없을 때 나타나는 곳
     let emptyStateView: UIView = {
-           let view = UIView()
-           view.translatesAutoresizingMaskIntoConstraints = false
-           view.isHidden = true
-           return view
-       }()
-
-       let emptyStateLabel: UILabel = {
-           let label = UILabel()
-           label.translatesAutoresizingMaskIntoConstraints = false
-           label.text = "자주가는 길을 등록해보세요."
-           label.font = UIFont.nanumSquareNeo(.bold, size: 17)
-           label.textColor = #colorLiteral(red: 0.5843136907, green: 0.5843136907, blue: 0.5843136907, alpha: 1)
-           return label
-       }()
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.isHidden = true
+        return view
+    }()
+    
+    let emptyStateLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.text = "자주가는 길을 등록해보세요."
+        label.font = UIFont.nanumSquareNeo(.bold, size: 17)
+        label.textColor = #colorLiteral(red: 0.5843136907, green: 0.5843136907, blue: 0.5843136907, alpha: 1)
+        return label
+    }()
     
     let emptyStateLabel2: UILabel = {
         let label = UILabel()
-           label.translatesAutoresizingMaskIntoConstraints = false
-           
-           let fullText = "자주 이용하는 길을 등록하고, \n언제든지 편하게 저상버스를 이용하세요!"
-           let paragraphStyle = NSMutableParagraphStyle()
-           paragraphStyle.lineSpacing = 3
-           
-           let attributedText = NSMutableAttributedString(string: fullText)
-           attributedText.addAttribute(.paragraphStyle, value: paragraphStyle, range: NSMakeRange(0, attributedText.length))
-           attributedText.addAttribute(.font, value: UIFont.nanumSquareNeo(.bold, size: 14), range: NSMakeRange(0, attributedText.length))
-           attributedText.addAttribute(.foregroundColor, value: UIColor(red: 0.7803922296, green: 0.7803922296, blue: 0.7803922296, alpha: 1), range: NSMakeRange(0, attributedText.length))
-           
-           label.attributedText = attributedText
-           label.numberOfLines = 2
-           label.textAlignment = .center
-           
-           return label
+        label.translatesAutoresizingMaskIntoConstraints = false
+        
+        let fullText = "자주 이용하는 길을 등록하고, \n언제든지 편하게 저상버스를 이용하세요!"
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineSpacing = 3
+        
+        let attributedText = NSMutableAttributedString(string: fullText)
+        attributedText.addAttribute(.paragraphStyle, value: paragraphStyle, range: NSMakeRange(0, attributedText.length))
+        attributedText.addAttribute(.font, value: UIFont.nanumSquareNeo(.bold, size: 14), range: NSMakeRange(0, attributedText.length))
+        attributedText.addAttribute(.foregroundColor, value: UIColor(red: 0.7803922296, green: 0.7803922296, blue: 0.7803922296, alpha: 1), range: NSMakeRange(0, attributedText.length))
+        
+        label.attributedText = attributedText
+        label.numberOfLines = 2
+        label.textAlignment = .center
+        
+        return label
     }()
-
+    
     let emptyStateImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -273,7 +275,7 @@ class MainViewController: UIViewController {
         imageView.contentMode = .scaleAspectFit
         return imageView
     }()
-//    출발, 도착 값이 다 담기면 나타나는 부분
+    //    출발, 도착 값이 다 담기면 나타나는 부분
     let recommendedRouteView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -281,7 +283,7 @@ class MainViewController: UIViewController {
         view.isHidden = true // 초기에는 숨김 상태
         return view
     }()
-
+    
     let recommendedRouteLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -290,7 +292,7 @@ class MainViewController: UIViewController {
         label.textColor = .black
         return label
     }()
-
+    
     let recommendedRouteTableView: UITableView = {
         let tableView = UITableView()
         tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -353,7 +355,7 @@ class MainViewController: UIViewController {
         }
         updateRecommendedRouteView()
     }
-
+    
     func updateArriveLabel() {
         if let value = arriveValue, !value.isEmpty {
             arriveLabel.text = value
@@ -380,7 +382,7 @@ class MainViewController: UIViewController {
             bottomview.isHidden = false
         }
     }
-
+    
     func swapDepartureAndArriveValues() {
         let tempDeparture = departureValue
         let tempArrive = arriveValue
@@ -417,34 +419,75 @@ class MainViewController: UIViewController {
     @objc func editbuttontaped() {
         print("edit button tapped")
         let modalViewController = EditViewController()
+        modalViewController.delegate = self
+        modalViewController.userId = self.userId
         modalViewController.modalPresentationStyle = .fullScreen
         self.present(modalViewController, animated: true)
     }
     
     func fetchFrequentRoutes() {
-        // 여기에 서버에서 데이터를 가져오는 로직을 구현합니다.
-        // 예시:
-        let newRoutes = [
-            FrequentRoute(startStation: "스타벅스 포항양덕지점", endStation: "강남역", busNumber: "9401"),
-            FrequentRoute(startStation: "홍대입구", endStation: "여의도", busNumber: "7711"),
-            FrequentRoute(startStation: "서울역", endStation: "강남역", busNumber: "9401"),
-            FrequentRoute(startStation: "홍대입구", endStation: "여의도", busNumber: "7711"),
-            FrequentRoute(startStation: "서울역", endStation: "강남역", busNumber: "9401"),
-            FrequentRoute(startStation: "홍대입구", endStation: "여의도", busNumber: "7711")
-        ]
+        guard let userId = userId else {
+            print("User ID is not available")
+            return
+        }
         
-        frequentRoutes.append(contentsOf: newRoutes)
-        updateEmptyState()
-        collectionView.reloadData()
+        let urlString = "http://ec2-3-34-193-237.ap-northeast-2.compute.amazonaws.com:8080/user/\(userId)"
+        guard let url = URL(string: urlString) else {
+            print("Invalid URL")
+            return
+        }
+        
+        URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
+            guard let self = self else { return }
+            
+            if let error = error {
+                print("Error fetching data: \(error.localizedDescription)")
+                return
+            }
+            
+            guard let data = data else {
+                print("No data received")
+                return
+            }
+            
+            do {
+                if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
+                   let routes = json["routes"] as? [String: [String: [String]]] {
+                    var newRoutes: [FrequentRoute] = []
+                    
+                    for (busNumber, routeInfo) in routes {
+                        if let route = routeInfo["route"],
+                           route.count >= 2 {
+                            let startStation = route[0]
+                            let endStation = route[1]
+                            let frequentRoute = FrequentRoute(startStation: startStation, endStation: endStation, busNumber: busNumber)
+                            newRoutes.append(frequentRoute)
+                        }
+                    }
+                    
+                    DispatchQueue.main.async {
+                        self.frequentRoutes = newRoutes
+                        self.updateEmptyState()
+                        self.collectionView.reloadData()
+                    }
+                }
+            } catch {
+                print("Error parsing JSON: \(error.localizedDescription)")
+            }
+        }.resume()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(red: 0.968, green: 0.968, blue: 0.968, alpha: 1)
-
         
+        print("\(userId)")
+        
+        
+        recommendedRouteTableView.separatorStyle = .none
         recommendedRouteTableView.delegate = self
         recommendedRouteTableView.dataSource = self
+        recommendedRouteTableView.register(RouteRecommendCell.self, forCellReuseIdentifier: "RouteRecommendCell")
         
         setUI()
         updateEmptyState()
@@ -537,21 +580,21 @@ class MainViewController: UIViewController {
             
             editbutton.topAnchor.constraint(equalTo: bottomview.topAnchor, constant: 20),
             editbutton.trailingAnchor.constraint(equalTo: searchview.trailingAnchor),
-
+            
             collectionView.topAnchor.constraint(equalTo: frequentRoutesLabel.bottomAnchor, constant: 10),
             collectionView.leadingAnchor.constraint(equalTo: bottomview.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: bottomview.trailingAnchor),
             collectionView.heightAnchor.constraint(equalToConstant: 170),
-
+            
             emptyStateView.centerXAnchor.constraint(equalTo: collectionView.centerXAnchor),
             emptyStateView.centerYAnchor.constraint(equalTo: collectionView.centerYAnchor, constant: -50),
-
+            
             emptyStateLabel.topAnchor.constraint(equalTo: emptyStateImageView.bottomAnchor, constant: 10),
             emptyStateLabel.centerXAnchor.constraint(equalTo: emptyStateView.centerXAnchor),
             
             emptyStateLabel2.topAnchor.constraint(equalTo: emptyStateLabel.bottomAnchor, constant: 10),
             emptyStateLabel2.centerXAnchor.constraint(equalTo: emptyStateView.centerXAnchor),
-
+            
             emptyStateImageView.centerXAnchor.constraint(equalTo: emptyStateView.centerXAnchor),
             emptyStateImageView.heightAnchor.constraint(equalToConstant: 55),
             
@@ -559,10 +602,10 @@ class MainViewController: UIViewController {
             recommendedRouteView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             recommendedRouteView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             recommendedRouteView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.5),
-
-            recommendedRouteLabel.topAnchor.constraint(equalTo: recommendedRouteView.topAnchor, constant: 10),
+            
+            recommendedRouteLabel.topAnchor.constraint(equalTo: recommendedRouteView.topAnchor, constant: 13),
             recommendedRouteLabel.leadingAnchor.constraint(equalTo: recommendedRouteView.leadingAnchor, constant: 30),
-
+            
             recommendedRouteTableView.topAnchor.constraint(equalTo: recommendedRouteView.topAnchor, constant: 60),
             recommendedRouteTableView.leadingAnchor.constraint(equalTo: recommendedRouteView.leadingAnchor),
             recommendedRouteTableView.trailingAnchor.constraint(equalTo: recommendedRouteView.trailingAnchor),
@@ -580,7 +623,7 @@ extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSour
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return frequentRoutes.count
     }
-
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "FrequentRouteCell", for: indexPath) as! FrequentRouteCell
         cell.configure(with: frequentRoutes[indexPath.item])
@@ -591,22 +634,22 @@ extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSour
         cell.contentView.layer.borderWidth = 2 // 테두리 굵기
         cell.contentView.layer.borderColor = UIColor(red: 0.951, green: 0.953, blue: 0.957, alpha: 1).cgColor
         cell.contentView.layer.masksToBounds = true // 내용이 셀의 경계를 넘지 않도록 설정
-
+        
         cell.layer.masksToBounds = true // cell 자체에도 설정
-
+        
         return cell
     }
-
+    
     // MARK: - UICollectionViewDelegateFlowLayout
-
+    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: 204, height: 152)
     }
-
+    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         return UIEdgeInsets(top: 0, left: view.frame.width * 0.077, bottom: 0, right: view.frame.width * 0.077)
     }
-
+    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         return 12 // 가로 간격
     }
@@ -616,11 +659,27 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 5 // 예시로 5개의 셀을 표시
     }
-
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "RecommendedRouteCell", for: indexPath)
-        cell.textLabel?.text = "추천 경로 \(indexPath.row + 1)"
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "RouteRecommendCell", for: indexPath) as? RouteRecommendCell else {
+            fatalError("Unable to dequeue RouteRecommendCell")
+        }
+        cell.backgroundColor = #colorLiteral(red: 0.9750779271, green: 0.9750778079, blue: 0.9750779271, alpha: 1)
+        cell.selectionStyle = .none
+        
+        // 여기에서 각 셀에 대한 데이터를 설정합니다.
+        cell.configure(totalTime: 45,
+                       wheelWalkTime: 10,
+                       firstWalkTime: 5,
+                       busTime: 30,
+                       finalWalkTime: 10,
+                       busNumber: "123",
+                       startBusStop: "출발 정류장",
+                       endBusStop: "도착 정류장")
         return cell
+    }
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 280
     }
 }
 

@@ -8,6 +8,53 @@
 import UIKit
 
 class LoadingViewController: UIViewController {
+    var userId: Int64?
+
+    func fetchUserId() {
+           guard let url = URL(string: "http://ec2-3-34-193-237.ap-northeast-2.compute.amazonaws.com:8080/user") else {
+               print("Invalid URL")
+               return
+           }
+
+           var request = URLRequest(url: url)
+           request.httpMethod = "POST"
+           request.addValue("*/*", forHTTPHeaderField: "accept")
+
+           // POST 요청이므로 body 데이터가 필요하다면 설정해줍니다.
+           // request.httpBody = someData
+
+           let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+               if let error = error {
+                   print("Error: \(error.localizedDescription)")
+                   return
+               }
+
+               guard let data = data else {
+                   print("No data received")
+                   return
+               }
+
+               do {
+                   if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Int64],
+                      let id = json["id"] {
+                       DispatchQueue.main.async {
+                           self?.userId = id
+                           print("User ID: \(id)")
+                           // UserDefaults에 저장
+                           UserDefaults.standard.set(id, forKey: "userId")
+                           // 여기에서 ID를 사용하여 추가 작업을 수행할 수 있습니다.
+                       }
+                   } else {
+                       print("Invalid JSON structure")
+                   }
+               } catch {
+                   print("JSON parsing error: \(error.localizedDescription)")
+               }
+           }
+
+           task.resume()
+       }
+    
     let busimage : UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -73,12 +120,22 @@ class LoadingViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = #colorLiteral(red: 0, green: 0.4780646563, blue: 0.9985368848, alpha: 1)
-                
+       
+    // 캐시된 사용자 ID를 로드
+        if let cachedUserId = UserDefaults.standard.value(forKey: "userId") as? Int64 {
+            self.userId = cachedUserId
+            print("Cached User ID: \(cachedUserId)")
+        } else {
+            fetchUserId() // 사용자 ID가 없으면 새로 생성
+        }
+        
         setfunc()
+        print("\(userId)")
         
         // 3초 후에 MainViewController로 전환
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
             let mainVC = MainViewController()
+            mainVC.userId = self.userId
             mainVC.modalPresentationStyle = .fullScreen
             self.present(mainVC, animated: true, completion: nil)
         }
