@@ -47,7 +47,7 @@ class MainViewController: UIViewController {
                 self.departureLon = Float(location.coordinate.longitude)
                 print("Departure Coordinates: \(self.departureLat), \(self.departureLon)")
             }
-        }        
+        }
     }
 
     
@@ -415,7 +415,7 @@ class MainViewController: UIViewController {
     }
     
     @objc func editbuttontaped() {
-        print("edit buttopn tapped")
+        print("edit button tapped")
         let modalViewController = EditViewController()
         modalViewController.modalPresentationStyle = .fullScreen
         self.present(modalViewController, animated: true)
