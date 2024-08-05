@@ -558,3 +558,8 @@ class RouteWalkthroughView: UIScrollView {
         updateDottedLinePath(for: secondGrayDottedLine)
     }
 }
+
+enum RouteSegmentType {
+    case walk
+    case bus
+}
