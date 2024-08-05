@@ -11,13 +11,18 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
 
-
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
-        window = UIWindow(frame: windowScene.coordinateSpace.bounds)
-        window?.windowScene = windowScene
-        window?.rootViewController = UINavigationController(rootViewController: LoadingViewController())
+        
+        window = UIWindow(windowScene: windowScene)
+        let loadingVC = LoadingViewController()
+        window?.rootViewController = loadingVC
         window?.makeKeyAndVisible()
+        
+        NotificationCenter.default.addObserver(forName: .init("CalculationsCompleted"), object: nil, queue: .main) { [weak self] _ in
+            let mainViewController = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController()
+            self?.window?.rootViewController = mainViewController
+        }
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {

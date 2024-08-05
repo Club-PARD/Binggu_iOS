@@ -4,10 +4,10 @@ import CoreLocation
 
 class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDelegate {
     
-    private let startCoordinate = CLLocationCoordinate2D(latitude: 35.8571043, longitude: 128.5483635)
-    private let destinationCoordinate = CLLocationCoordinate2D(latitude: 35.8411705, longitude: 128.6815273)
-    private let preferredStationId = "DGB7041024200"
-    private let preferredRouteId = "DGB3000509000"
+    private let startCoordinate = CLLocationCoordinate2D(latitude: 35.88934560701709, longitude: 128.6159348487854)
+    private let destinationCoordinate = CLLocationCoordinate2D(latitude: 35.8438086, longitude: 128.5670053)
+    private let preferredStationId = "DGB7011010100"
+    private let preferredRouteId = "DGB3000503000"
     private var firstStationCoordinate: CLLocationCoordinate2D?
     private var busNumber: String?
     private var currentLocationButton: UIButton!
@@ -422,5 +422,13 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         let busSpeedKmPerHour = 140.0
         let timeInHours = distance / (busSpeedKmPerHour * 1000)
         return Int(ceil(timeInHours * 60))
+    }
+}
+
+extension CLLocationCoordinate2D {
+    func distance(to coordinate: CLLocationCoordinate2D) -> CLLocationDistance {
+        let from = CLLocation(latitude: self.latitude, longitude: self.longitude)
+        let to = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
+        return from.distance(from: to)
     }
 }
