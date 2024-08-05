@@ -25,6 +25,26 @@ class MainViewController: UIViewController, EditViewControllerDelegate {
     
     var stationId: String = "DGB7011010100"
     var routeId: String = "DGB3000503000"
+    var stationId2: String = "DGB7041024200"
+    var routeId2: String = "DGB3000509000"
+    
+    var walkTime1Route1: Int?
+    var walkTime2Route1: Int?
+    var busTimeRoute1: Int?
+    var walkTime1Route2: Int?
+    var walkTime2Route2: Int?
+    var busTimeRoute2: Int?
+    var finalStationRoute1: String?
+    var firstStationRoute1: String?
+    var busNumRoute1: Int?
+    var finalStationRoute2: String?
+    var firstStationRoute2: String?
+    var busNumRoute2: Int?
+    
+    var walkadd1: Int?
+    var walkadd2: Int?
+    var addall1: Int?
+    var addall2: Int?
     
     func convertAddressToCoordinates(address: String, isArrival: Bool) {
         let geocoder = CLGeocoder()
@@ -482,8 +502,86 @@ class MainViewController: UIViewController, EditViewControllerDelegate {
         }.resume()
     }
     
+    @objc func calculationsCompleted() {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            return
+        }
+        
+        // AppDelegate의 값을 MainViewController의 변수에 할당
+        self.walkTime1Route1 = appDelegate.walkTime1Route1
+        self.walkTime2Route1 = appDelegate.walkTime2Route1
+        self.busTimeRoute1 = appDelegate.busTimeRoute1
+        self.walkTime1Route2 = appDelegate.walkTime1Route2
+        self.walkTime2Route2 = appDelegate.walkTime2Route2
+        self.busTimeRoute2 = appDelegate.busTimeRoute2
+        self.finalStationRoute1 = appDelegate.finalStationRoute1
+        self.firstStationRoute1 = appDelegate.firstStationRoute1
+        self.finalStationRoute2 = appDelegate.finalStationRoute2
+        self.firstStationRoute2 = appDelegate.firstStationRoute2
+
+        if let busNumString1 = appDelegate.busNumRoute1 {
+            self.busNumRoute1 = Int(busNumString1)
+        }
+
+        // busNumRoute2 변환 및 할당
+        if let busNumString2 = appDelegate.busNumRoute2 {
+            self.busNumRoute2 = Int(busNumString2)
+        }
+  
+        if let walkTime1Route1 = appDelegate.walkTime1Route1,
+           let walkTime2Route1 = appDelegate.walkTime2Route1 {
+            self.walkadd1 = walkTime1Route1 + walkTime2Route1
+        } else {
+            // 둘 중 하나라도 nil인 경우 처리
+            self.walkadd1 = 0 // 또는 다른 기본값
+        }
+        
+        if let walkTime1Route2 = appDelegate.walkTime1Route2,
+           let walkTime2Route2 = appDelegate.walkTime2Route2 {
+            self.walkadd2 = walkTime1Route2 + walkTime2Route2
+        } else {
+            // 둘 중 하나라도 nil인 경우 처리
+            self.walkadd2 = 0 // 또는 다른 기본값
+        }
+        
+        if let walkTime1Route1 = appDelegate.walkTime1Route1,
+           let walkTime2Route1 = appDelegate.walkTime2Route1,
+           let busTimeRoute1 = appDelegate.busTimeRoute1 {
+            self.addall1 = walkTime1Route1 + walkTime2Route1 + busTimeRoute1
+        } else {
+            // 둘 중 하나라도 nil인 경우 처리
+            self.addall1 = 0 // 또는 다른 기본값
+        }
+        
+        if let walkTime1Route2 = appDelegate.walkTime1Route2,
+           let walkTime2Route2 = appDelegate.walkTime2Route2,
+           let busTimeRoute2 = appDelegate.busTimeRoute2 {
+            self.addall2 = walkTime1Route2 + walkTime2Route2 + busTimeRoute2
+        } else {
+            // 둘 중 하나라도 nil인 경우 처리
+            self.addall2 = 0 // 또는 다른 기본값
+        }
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        //            // 값이 할당된 후 필요한 작업 수행
+        //            print("All calculations completed and values assigned")
+        //            logAllVariables()
+        //            updateUI()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        calculationsCompleted()
+        
         view.backgroundColor = UIColor(red: 0.968, green: 0.968, blue: 0.968, alpha: 1)
         
         print("\(userId)")
@@ -675,7 +773,7 @@ extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSour
 // 출발, 도착 값 있을 떄 따는 tableview 관리
 extension MainViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 5 // 예시로 5개의 셀을 표시
+        return 2 // 예시로 5개의 셀을 표시
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -689,16 +787,42 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
         print("Cell delegate set")  // 디버깅 메시지 추가
         
         // 여기에서 각 셀에 대한 데이터를 설정합니다.
-        cell.configure(totalTime: 45,
-                       wheelWalkTime: 10,
-                       firstWalkTime: 5,
-                       busTime: 30,
-                       finalWalkTime: 10,
-                       busNumber: 123,
-                       startBusStop: "출발 정류장",
-                       endBusStop: "도착 정류장",
-                       stationId: self.stationId,
-                       routeId: self.routeId)
+        switch indexPath.row {
+        case 0:
+            cell.configure(totalTime: addall1!,
+                           wheelWalkTime: walkadd1!,
+                           firstWalkTime: walkTime1Route1!,
+                           busTime: busTimeRoute1!,
+                           finalWalkTime: walkTime2Route1!,
+                           busNumber: busNumRoute1!,
+                           startBusStop: firstStationRoute1!,
+                           endBusStop: finalStationRoute1!,
+                           stationId: self.stationId,
+                           routeId: self.routeId)
+        case 1:
+            cell.configure(totalTime: addall2!,
+                           wheelWalkTime: walkadd2!,
+                           firstWalkTime: walkTime1Route2!,
+                           busTime: busTimeRoute2!,
+                           finalWalkTime: walkTime2Route2!,
+                               busNumber: busNumRoute2!,
+                               startBusStop: firstStationRoute2!,
+                               endBusStop: finalStationRoute2!,
+                               stationId: self.stationId2,
+                               routeId: self.routeId2)
+            default:
+                // 기본 데이터 설정 (필요한 경우)
+                cell.configure(totalTime: 0,
+                               wheelWalkTime: 0,
+                               firstWalkTime: 0,
+                               busTime: 0,
+                               finalWalkTime: 0,
+                               busNumber: 0,
+                               startBusStop: "",
+                               endBusStop: "",
+                               stationId: "",
+                               routeId: "")
+            }
         return cell
     }
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {

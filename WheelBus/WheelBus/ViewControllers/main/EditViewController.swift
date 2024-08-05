@@ -18,6 +18,8 @@ class EditViewController: UIViewController {
     var selectedIndexPaths: Set<IndexPath> = [] //셀 선택하고 삭제하기 위해서
     var isAllSelected = false   //전체선택 하기 위해서
     
+    private var deleteButtonLabelTrailingConstraint: NSLayoutConstraint?
+    
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
@@ -85,19 +87,30 @@ class EditViewController: UIViewController {
     }()
     
     private lazy var deleteButton: UIButton = {
-        let button = UIButton(type: .system)
+        let button = UIButton(type: .custom)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("선택 삭제", for: .normal)
-        button.titleLabel?.font = UIFont.nanumSquareNeo(.bold, size: 25)
         button.backgroundColor = #colorLiteral(red: 0.837211132, green: 0.8480320573, blue: 0.8766182065, alpha: 1)
-        button.setTitleColor(.white, for: .normal)
         button.isEnabled = false
         button.addTarget(self, action: #selector(deleteButtonTapped), for: .touchUpInside)
-        
-        button.contentHorizontalAlignment = .center // 수평 중앙 정렬
-        button.contentVerticalAlignment = .top // 수직 중앙 정렬
-        button.titleEdgeInsets = UIEdgeInsets(top: 10, left: 20, bottom: 10, right: 20) // 제목 여백 설정
         return button
+    }()
+
+    private lazy var deleteButtonLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.text = "선택 삭제"
+        label.font = UIFont.nanumSquareNeo(.bold, size: 25)
+        label.textColor = .white
+        return label
+    }()
+    
+    private let countLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.nanumSquareNeo(.bold, size: 25)
+        label.textColor = .white
+        label.textAlignment = .right
+        return label
     }()
     
     // 즐겨찾기 등록된 값 없을 때 나타나는 곳
@@ -157,20 +170,22 @@ class EditViewController: UIViewController {
     
     @objc private func deleteButtonTapped() {
         deleteSelectedRoutes()
+        allselectbutton.configuration?.image = UIImage(named: "uncheck")
+        
     }
     
     
-//    
-//    if selectedIndexPaths.contains(indexPath) {
-//        selectedIndexPaths.remove(indexPath)
-//    } else {
-//        selectedIndexPaths.insert(indexPath)
-//    }
-//    
-//    if let cell = collectionView.cellForItem(at: indexPath) as? FrequentEditCell {
-//        cell.setSelected(selectedIndexPaths.contains(indexPath))
-//    }
-//    
+    //
+    //    if selectedIndexPaths.contains(indexPath) {
+    //        selectedIndexPaths.remove(indexPath)
+    //    } else {
+    //        selectedIndexPaths.insert(indexPath)
+    //    }
+    //
+    //    if let cell = collectionView.cellForItem(at: indexPath) as? FrequentEditCell {
+    //        cell.setSelected(selectedIndexPaths.contains(indexPath))
+    //    }
+    //
     
     
     // 전체삭제 선택
@@ -198,13 +213,19 @@ class EditViewController: UIViewController {
     private func updateDeleteButtonState() {
         let count = selectedIndexPaths.count
         if count > 0 {
-            deleteButton.setTitle("\(count) 선택 삭제", for: .normal)
+            countLabel.animateTextChange(to: "\(count)")
             deleteButton.backgroundColor = #colorLiteral(red: 0.2509803922, green: 0.4745098039, blue: 1, alpha: 1)
             deleteButton.isEnabled = true
+            deleteButtonLabelTrailingConstraint?.constant = 10
         } else {
-            deleteButton.setTitle("선택 삭제", for: .normal)
+            countLabel.animateTextChange(to: "")
             deleteButton.backgroundColor = #colorLiteral(red: 0.837211132, green: 0.8480320573, blue: 0.8766182065, alpha: 1)
             deleteButton.isEnabled = false
+            deleteButtonLabelTrailingConstraint?.constant = 0
+        }
+        
+        UIView.animate(withDuration: 0.3) {
+            self.deleteButton.layoutIfNeeded()
         }
     }
     
@@ -213,6 +234,7 @@ class EditViewController: UIViewController {
         
         for route in selectedRoutes {
             deleteRoute(busNumber: route.busNumber)
+            
         }
     }
     
@@ -275,11 +297,15 @@ class EditViewController: UIViewController {
         view.addSubview(line)
         view.addSubview(emptyStateView)
         view.addSubview(deleteButton)
+        deleteButton.addSubview(deleteButtonLabel)
+        deleteButton.addSubview(countLabel)
         view.addSubview(allselectbutton)
         view.addSubview(allLabel)
         emptyStateView.addSubview(emptyStateLabel)
         emptyStateView.addSubview(emptyStateLabel2)
         emptyStateView.addSubview(emptyStateImageView)
+        
+        deleteButtonLabelTrailingConstraint = deleteButtonLabel.centerXAnchor.constraint(equalTo: deleteButton.centerXAnchor, constant: 0)
         
         NSLayoutConstraint.activate([
             backButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 80),
@@ -326,9 +352,16 @@ class EditViewController: UIViewController {
             emptyStateLabel2.topAnchor.constraint(equalTo: emptyStateLabel.bottomAnchor, constant: 10),
             emptyStateLabel2.centerXAnchor.constraint(equalTo: emptyStateView.centerXAnchor),
             
-            emptyStateImageView.centerXAnchor.constraint(equalTo: emptyStateView.centerXAnchor),
+            emptyStateImageView.bottomAnchor.constraint(equalTo: emptyStateView.bottomAnchor),
             emptyStateImageView.heightAnchor.constraint(equalToConstant: 84),
             emptyStateImageView.topAnchor.constraint(equalTo: editlabel.bottomAnchor, constant: 220),
+            
+            deleteButtonLabel.topAnchor.constraint(equalTo: deleteButton.topAnchor, constant: 19),
+            deleteButtonLabelTrailingConstraint!,
+
+            countLabel.centerYAnchor.constraint(equalTo: deleteButtonLabel.centerYAnchor),
+            countLabel.trailingAnchor.constraint(equalTo: deleteButtonLabel.leadingAnchor, constant: -5),
+            countLabel.widthAnchor.constraint(equalToConstant: 40)
         ])
     }
     
@@ -399,7 +432,7 @@ extension EditViewController: UICollectionViewDelegate, UICollectionViewDataSour
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "FrequentEditCell", for: indexPath) as! FrequentEditCell
         cell.configure(with: frequentRoutes[indexPath.item])
-                
+        
         // 여기에 셀의 선택 상태를 설정합니다
         cell.setSelected(selectedIndexPaths.contains(indexPath))
         
@@ -451,5 +484,13 @@ extension EditViewController: UICollectionViewDelegate, UICollectionViewDataSour
     }
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         return UIEdgeInsets(top: 16, left: 0, bottom: 19, right: 0)
+    }
+}
+
+extension UILabel {
+    func animateTextChange(to newText: String, duration: TimeInterval = 0.3) {
+        UIView.transition(with: self, duration: duration, options: .transitionCrossDissolve, animations: {
+            self.text = newText
+        }, completion: nil)
     }
 }
