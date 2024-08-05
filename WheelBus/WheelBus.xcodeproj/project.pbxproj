@@ -36,6 +36,10 @@
 		8179B2492C5FB582005D8BE7 /* NotoSansKR-Black.otf in Resources */ = {isa = PBXBuildFile; fileRef = 8179B2432C5FB582005D8BE7 /* NotoSansKR-Black.otf */; };
 		8179B24A2C5FB582005D8BE7 /* NotoSansKR-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 8179B2442C5FB582005D8BE7 /* NotoSansKR-Bold.otf */; };
 		8179B24C2C60C6BC005D8BE7 /* AddressTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8179B24B2C60C6BC005D8BE7 /* AddressTableViewCell.swift */; };
+		B3434FB92C60C84000A81079 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3434FB42C60C84000A81079 /* MapViewController.swift */; };
+		B3434FBA2C60C84000A81079 /* MapViewController2.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3434FB52C60C84000A81079 /* MapViewController2.swift */; };
+		B3434FBB2C60C84000A81079 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3434FB62C60C84000A81079 /* NetworkManager.swift */; };
+		B3434FBC2C60C84000A81079 /* RouteWalkthroughView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3434FB72C60C84000A81079 /* RouteWalkthroughView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -89,6 +93,10 @@
 		8179B2432C5FB582005D8BE7 /* NotoSansKR-Black.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NotoSansKR-Black.otf"; sourceTree = "<group>"; };
 		8179B2442C5FB582005D8BE7 /* NotoSansKR-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NotoSansKR-Bold.otf"; sourceTree = "<group>"; };
 		8179B24B2C60C6BC005D8BE7 /* AddressTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressTableViewCell.swift; sourceTree = "<group>"; };
+		B3434FB42C60C84000A81079 /* MapViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
+		B3434FB52C60C84000A81079 /* MapViewController2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapViewController2.swift; sourceTree = "<group>"; };
+		B3434FB62C60C84000A81079 /* NetworkManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
+		B3434FB72C60C84000A81079 /* RouteWalkthroughView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RouteWalkthroughView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -172,6 +180,7 @@
 		22BDD0002C5B72C000EF6205 /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
+				B3434FB82C60C84000A81079 /* Map */,
 				8179B1F22C5CF2CA005D8BE7 /* main */,
 				22BDCFD42C5B727300EF6205 /* MainViewController.swift */,
 			);
@@ -209,6 +218,17 @@
 				8179B2252C5D0F41005D8BE7 /* NanumSquareNeo-Regular.otf */,
 			);
 			path = Fonts;
+			sourceTree = "<group>";
+		};
+		B3434FB82C60C84000A81079 /* Map */ = {
+			isa = PBXGroup;
+			children = (
+				B3434FB42C60C84000A81079 /* MapViewController.swift */,
+				B3434FB52C60C84000A81079 /* MapViewController2.swift */,
+				B3434FB62C60C84000A81079 /* NetworkManager.swift */,
+				B3434FB72C60C84000A81079 /* RouteWalkthroughView.swift */,
+			);
+			path = Map;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -359,12 +379,16 @@
 				8179B2362C5DFF27005D8BE7 /* FrequentRouteCell.swift in Sources */,
 				8179B2322C5D2C17005D8BE7 /* DepartureModalViewController.swift in Sources */,
 				8179B23C2C5F53D3005D8BE7 /* FrequentEditCell.swift in Sources */,
+				B3434FB92C60C84000A81079 /* MapViewController.swift in Sources */,
 				8179B24C2C60C6BC005D8BE7 /* AddressTableViewCell.swift in Sources */,
+				B3434FBA2C60C84000A81079 /* MapViewController2.swift in Sources */,
 				8179B2342C5D755E005D8BE7 /* ArriveModalViewController.swift in Sources */,
 				8179B23E2C5F7CEB005D8BE7 /* RouteRecommendCell.swift in Sources */,
 				22BDCFD32C5B727300EF6205 /* SceneDelegate.swift in Sources */,
+				B3434FBB2C60C84000A81079 /* NetworkManager.swift in Sources */,
 				8179B1F42C5CF2E3005D8BE7 /* LoadingViewController.swift in Sources */,
 				8179B2382C5E0F8E005D8BE7 /* EditViewController.swift in Sources */,
+				B3434FBC2C60C84000A81079 /* RouteWalkthroughView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
