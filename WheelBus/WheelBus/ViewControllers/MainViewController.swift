@@ -657,6 +657,20 @@ extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSour
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         return 12 // 가로 간격
     }
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        switch indexPath.row {
+        case 0:
+            let mainVC = MapViewController()
+            mainVC.modalPresentationStyle = .fullScreen
+            self.present(mainVC, animated: true, completion: nil)
+        case 1:
+            let mainVC = MapViewController2()
+            mainVC.modalPresentationStyle = .fullScreen
+            self.present(mainVC, animated: true, completion: nil)
+        default:
+            break
+        }
+    }
 }
 // 출발, 도착 값 있을 떄 따는 tableview 관리
 extension MainViewController: UITableViewDelegate, UITableViewDataSource {
@@ -689,6 +703,20 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
     }
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 280
+    }
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        switch indexPath.row {
+        case 0:
+            let mainVC = MapViewController()
+            mainVC.modalPresentationStyle = .fullScreen
+            self.present(mainVC, animated: true, completion: nil)
+        case 1:
+            let mainVC = MapViewController2()
+            mainVC.modalPresentationStyle = .fullScreen
+            self.present(mainVC, animated: true, completion: nil)
+        default:
+            break
+        }
     }
 }
 
