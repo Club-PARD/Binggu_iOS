@@ -8,8 +8,92 @@
 
 import UIKit
 
+protocol RouteRecommendCellDelegate: AnyObject {
+    func routeRecommendCell(_ cell: RouteRecommendCell, didTapAddRoutineButton isSelected: Bool, routeId: Int, startStation: String, endStation: String)
+}
+
 class RouteRecommendCell: UITableViewCell {
     private let minSegmentWidth: CGFloat = 40
+    weak var delegate: RouteRecommendCellDelegate?
+    
+    var routeId: Int?
+    var startStation: String?
+    var endStation: String?
+    
+    //1분마다 시간 불러오기위해서
+    private var updateTimer: Timer?
+    private var currentStationId: String?
+    private var currentRouteId: String?
+    
+    //1분마다 불러오기위해서 타이머 설정하는 함수
+    func fetchBusArrivalInfo(stationId: String, routeId: String) {
+        // 기존 stationId와 routeId가 다르면 타이머를 초기화합니다.
+        if stationId != currentStationId || routeId != currentRouteId {
+            updateTimer?.invalidate()
+            currentStationId = stationId
+            currentRouteId = routeId
+            
+            // 새로운 타이머 설정
+            updateTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
+                self?.fetchBusArrivalInfoFromServer()
+            }
+        }
+        
+        // 즉시 한 번 실행
+        fetchBusArrivalInfoFromServer()
+    }
+    
+    private func fetchBusArrivalInfoFromServer() {
+        guard let stationId = currentStationId, let routeId = currentRouteId else { return }
+        
+        let urlString = "http://ec2-3-34-193-237.ap-northeast-2.compute.amazonaws.com:8080/bus/arrivalTime"
+        guard let url = URL(string: urlString) else { return }
+        
+        let parameters: [String: Any] = [
+            "stationId": stationId,
+            "routeId": routeId
+        ]
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: parameters)
+        } catch {
+            print("Error: unable to serialize parameters")
+            return
+        }
+        
+        URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+            guard let self = self else { return }
+            
+            if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 404 {
+                DispatchQueue.main.async {
+                    self.busArrivalInfoLabel.text = "도착 예정 정보없음"
+                    self.busArrivalInfoLabel.textColor = UIColor(red: 0.78, green: 0.78, blue: 0.78, alpha: 1)
+                }
+                return
+            }
+            
+            guard let data = data else {
+                print("No data received")
+                return
+            }
+            
+            do {
+                if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
+                   let arrivalMin = json["arrivalMin"] as? Int {
+                    DispatchQueue.main.async {
+                        self.busArrivalInfoLabel.text = "\(arrivalMin)분 후 도착예정"
+                        self.busArrivalInfoLabel.textColor = .red
+                    }
+                }
+            } catch {
+                print("Error parsing JSON: \(error.localizedDescription)")
+            }
+        }.resume()
+    }
     
     private let totalTimeLabel: UILabel = {
         let label = UILabel()
@@ -58,12 +142,15 @@ class RouteRecommendCell: UITableViewCell {
         return stackView
     }()
     
-    private let addRoutineImage: UIImageView = {
-        let imageView = UIImageView()
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.image = UIImage(named: "Add")
-        imageView.contentMode = .scaleAspectFit
-        return imageView
+    private lazy var addRoutineButton: UIButton = {
+        let button = UIButton(type: .custom)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setImage(UIImage(named: "routineIcon"), for: .normal)
+        button.setImage(UIImage(named: "routineIconSelected"), for: .selected)
+        button.contentMode = .scaleAspectFit
+        button.layer.cornerRadius = 6
+        button.addTarget(self, action: #selector(addRoutineButtonTapped), for: .touchUpInside)
+        return button
     }()
     
     private let busRoutineSummaryImage: UIImageView = {
@@ -144,7 +231,7 @@ class RouteRecommendCell: UITableViewCell {
         contentView.addSubview(wheelWalkTimeImage)
         contentView.addSubview(wheelWalkTimeLabel)
         contentView.addSubview(routeStackView)
-        contentView.addSubview(addRoutineImage)
+        contentView.addSubview(addRoutineButton)
         contentView.addSubview(busRoutineSummaryImage)
         contentView.addSubview(busNumImage)
         contentView.addSubview(busNumberLabel)
@@ -174,10 +261,10 @@ class RouteRecommendCell: UITableViewCell {
             routeStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -30.5),
             routeStackView.heightAnchor.constraint(equalToConstant: 24),
             
-            addRoutineImage.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -19),
-            addRoutineImage.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -31),
-            addRoutineImage.widthAnchor.constraint(equalToConstant: 100),
-            addRoutineImage.heightAnchor.constraint(equalToConstant: 34),
+            addRoutineButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -19),
+            addRoutineButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -31),
+            addRoutineButton.widthAnchor.constraint(equalToConstant: 100),
+            addRoutineButton.heightAnchor.constraint(equalToConstant: 34),
             
             busRoutineSummaryImage.topAnchor.constraint(equalTo: routeStackView.bottomAnchor, constant: 23),
             busRoutineSummaryImage.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 42),
@@ -200,11 +287,15 @@ class RouteRecommendCell: UITableViewCell {
             
             busArrivalInfoLabel.topAnchor.constraint(equalTo: busNumImage.bottomAnchor, constant: 10),
             busArrivalInfoLabel.leadingAnchor.constraint(equalTo: busNumImage.leadingAnchor),
-            
         ])
-        
         setupRouteView()
-        
+    }
+    
+    @objc private func addRoutineButtonTapped() {
+        addRoutineButton.isSelected.toggle()
+        if let routeId = routeId, let startStation = startStation, let endStation = endStation {
+            delegate?.routeRecommendCell(self, didTapAddRoutineButton: addRoutineButton.isSelected, routeId: routeId, startStation: startStation, endStation: endStation)
+        }
     }
     
     private func updateDottedLinePath(for view: UIView) {
@@ -371,8 +462,12 @@ class RouteRecommendCell: UITableViewCell {
         wheelWalkTimeLabel.text = "휠워크 \(time)분"
     }
     
-    func updateBusNumber(_ number: String) {
-        busNumberLabel.text = number
+    private func updatebusArrivalInfoLabel(_ time: Int) {
+        wheelWalkTimeLabel.text = "휠워크 \(time)분"
+    }
+    
+    func updateBusNumber(_ number: Int) {
+        busNumberLabel.text = "\(number)"
     }
     
     func updateBusStopNames(start: String, end: String) {
@@ -405,7 +500,7 @@ class RouteRecommendCell: UITableViewCell {
             durationLabel.text = "\(time)분"
         }
     }
-    func setupRouteInfo(totalTime: Int, wheelWalkTime: Int, firstWalkTime: Int, busTime: Int, finalWalkTime: Int, busNumber: String, startBusStop: String, endBusStop: String) {
+    func setupRouteInfo(totalTime: Int, wheelWalkTime: Int, firstWalkTime: Int, busTime: Int, finalWalkTime: Int, busNumber: Int, startBusStop: String, endBusStop: String) {
         updateTotalTime(totalTime)
         updateWheelWalkTime(wheelWalkTime)
         setupRouteSegments(firstWalkTime: firstWalkTime, busTime: busTime, finalWalkTime: finalWalkTime)
@@ -414,17 +509,30 @@ class RouteRecommendCell: UITableViewCell {
         setContentVisible(true)
     }
     
-    func configure(totalTime: Int, wheelWalkTime: Int, firstWalkTime: Int, busTime: Int, finalWalkTime: Int, busNumber: String, startBusStop: String, endBusStop: String) {
+    func configure(totalTime: Int, wheelWalkTime: Int, firstWalkTime: Int, busTime: Int, finalWalkTime: Int, busNumber: Int, startBusStop: String, endBusStop: String, stationId: String, routeId: String) {
         updateTotalTime(totalTime)
         updateWheelWalkTime(wheelWalkTime)
         setupRouteSegments(firstWalkTime: firstWalkTime, busTime: busTime, finalWalkTime: finalWalkTime)
         updateBusNumber(busNumber)
         updateBusStopNames(start: startBusStop, end: endBusStop)
+        fetchBusArrivalInfo(stationId: stationId, routeId: routeId)
+        
+        self.routeId = busNumber
+        self.startStation = startBusStop
+        self.endStation = endBusStop
     }
     override func layoutSubviews() {
         super.layoutSubviews()
         contentView.backgroundColor = .white
         contentView.frame = contentView.frame.inset(by: UIEdgeInsets(top: 0, left: 0, bottom: 10, right: 0))
+    }
+    //Cell이 재사용될 때 Timer를 정리하기 위해
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        updateTimer?.invalidate()
+        updateTimer = nil
+        currentStationId = nil
+        currentRouteId = nil
     }
 }
 

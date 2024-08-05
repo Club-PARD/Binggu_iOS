@@ -23,6 +23,9 @@ class MainViewController: UIViewController, EditViewControllerDelegate {
     var arriveLat: Float = 0.0
     var arriveLon: Float = 0.0
     
+    var stationId: String = "DGB7011010100"
+    var routeId: String = "DGB3000503000"
+    
     func convertAddressToCoordinates(address: String, isArrival: Bool) {
         let geocoder = CLGeocoder()
         
@@ -51,7 +54,6 @@ class MainViewController: UIViewController, EditViewControllerDelegate {
             }
         }
     }
-    
     
     let topview : UIView = {
         let top = UIView()
@@ -162,7 +164,6 @@ class MainViewController: UIViewController, EditViewControllerDelegate {
         let button  = UIButton(configuration: config)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(changeButtonTapped), for: .touchUpInside)
-        
         return button
     }()
     
@@ -377,6 +378,10 @@ class MainViewController: UIViewController, EditViewControllerDelegate {
             // 둘 다 값 들어있으면 이걸로 위도 경도 받아오기
             convertAddressToCoordinates(address: departureValue!, isArrival: false)
             convertAddressToCoordinates(address: arriveValue!, isArrival: true)
+            
+            //여기서 위도, 경도 전송도 해주면 되겠다.
+            
+            
         } else {
             recommendedRouteView.isHidden = true
             bottomview.isHidden = false
@@ -482,7 +487,6 @@ class MainViewController: UIViewController, EditViewControllerDelegate {
         view.backgroundColor = UIColor(red: 0.968, green: 0.968, blue: 0.968, alpha: 1)
         
         print("\(userId)")
-        
         
         recommendedRouteTableView.separatorStyle = .none
         recommendedRouteTableView.delegate = self
@@ -667,15 +671,20 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
         cell.backgroundColor = #colorLiteral(red: 0.9750779271, green: 0.9750778079, blue: 0.9750779271, alpha: 1)
         cell.selectionStyle = .none
         
+        cell.delegate = self
+        print("Cell delegate set")  // 디버깅 메시지 추가
+        
         // 여기에서 각 셀에 대한 데이터를 설정합니다.
         cell.configure(totalTime: 45,
                        wheelWalkTime: 10,
                        firstWalkTime: 5,
                        busTime: 30,
                        finalWalkTime: 10,
-                       busNumber: "123",
+                       busNumber: 123,
                        startBusStop: "출발 정류장",
-                       endBusStop: "도착 정류장")
+                       endBusStop: "도착 정류장",
+                       stationId: self.stationId,
+                       routeId: self.routeId)
         return cell
     }
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -683,7 +692,150 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
     }
 }
 
+extension MainViewController: RouteRecommendCellDelegate {
+    func routeRecommendCell(_ cell: RouteRecommendCell, didTapAddRoutineButton isSelected: Bool, routeId: Int, startStation: String, endStation: String) {
+        if isSelected {
+            sendRouteInfoToServer(routeId: routeId, startStation: startStation, endStation: endStation)
+        } else {
+            deleteRouteFromServer(routeId: routeId)
+        }
+        print("Delegate method called. isSelected: \(isSelected)")
+        let message = isSelected ? "자주 가는 길로 등록되었습니다." : "자주 가는 길이 해제되었습니다."
+        let image = isSelected ? UIImage(named: "checkmark") : UIImage(named: "cross")
+        showSnackbarWithImage(message: message, image: image)
+    }
+    
+    private func showSnackbarWithImage(message: String, image: UIImage?) {
+        print("Attempting to show snackbar with message: \(message)")
+        
+        DispatchQueue.main.async {
+            let snackbar = UIView()
+            snackbar.backgroundColor = UIColor(red: 0.224, green: 0.224, blue: 0.224, alpha: 0.95)
+            snackbar.layer.cornerRadius = 4
+            snackbar.translatesAutoresizingMaskIntoConstraints = false
+            
+            let label = UILabel()
+            label.text = message
+            label.textColor = .white // 변경: 텍스트 색상을 흰색으로 설정
+            label.font = UIFont.nanumSquareNeo(.bold, size: 15)
+            label.translatesAutoresizingMaskIntoConstraints = false
+            
+            let imageView = UIImageView(image: image)
+            imageView.contentMode = .scaleAspectFit
+            imageView.translatesAutoresizingMaskIntoConstraints = false
+            
+            snackbar.addSubview(imageView)
+            snackbar.addSubview(label)
+            self.view.addSubview(snackbar)
+            
+            NSLayoutConstraint.activate([
+                snackbar.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor, constant: 0),
+                snackbar.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
+                snackbar.widthAnchor.constraint(equalTo: self.view.widthAnchor, constant: -34),
+                snackbar.heightAnchor.constraint(equalToConstant: 60), // 고정 높이 설정
+                
+                imageView.leadingAnchor.constraint(equalTo: snackbar.leadingAnchor, constant: 16),
+                imageView.centerYAnchor.constraint(equalTo: snackbar.centerYAnchor),
+                imageView.widthAnchor.constraint(equalToConstant: 24),
+                imageView.heightAnchor.constraint(equalToConstant: 24),
+                
+                label.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: 8),
+                label.trailingAnchor.constraint(equalTo: snackbar.trailingAnchor, constant: -16),
+                label.centerYAnchor.constraint(equalTo: snackbar.centerYAnchor)
+            ])
+            
+            snackbar.alpha = 0
+            self.view.layoutIfNeeded()
+            
+            UIView.animate(withDuration: 0.3, animations: {
+                snackbar.alpha = 1
+            }) { _ in
+                UIView.animate(withDuration: 0.3, delay: 2.0, options: .curveEaseOut, animations: {
+                    snackbar.alpha = 0
+                }) { _ in
+                    snackbar.removeFromSuperview()
+                }
+            }
+        }
+    }
+    func sendRouteInfoToServer(routeId: Int, startStation: String, endStation: String) {
+        guard let userId = userId else {
+            print("User ID is not available")
+            return
+        }
 
+        guard let url = URL(string: "http://ec2-3-34-193-237.ap-northeast-2.compute.amazonaws.com:8080/user/\(userId)") else { return }
+        
+        let parameters: [String: Any] = [
+            "routeId": routeId,
+            "route": [
+                "route": [startStation, endStation]
+            ]
+        ]
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: parameters)
+        } catch {
+            print("Error: unable to serialize parameters")
+            return
+        }
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error: \(error.localizedDescription)")
+                return
+            }
+            
+            if let httpResponse = response as? HTTPURLResponse {
+                print("Status code: \(httpResponse.statusCode)")
+            }
+            
+            if let data = data, let dataString = String(data: data, encoding: .utf8) {
+                print("Response data: \(dataString)")
+            }
+        }.resume()
+    }
+    // 즐겨찾기 해제
+    func deleteRouteFromServer(routeId: Int) {
+        guard let userId = userId else {
+            print("User ID is not available")
+            return
+        }
+        
+        guard let url = URL(string: "http://ec2-3-34-193-237.ap-northeast-2.compute.amazonaws.com:8080/user/\(userId)/\(routeId)") else {
+            print("Invalid URL")
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error: \(error.localizedDescription)")
+                return
+            }
+            
+            if let httpResponse = response as? HTTPURLResponse {
+                print("Status code: \(httpResponse.statusCode)")
+                
+                if httpResponse.statusCode == 200 {
+                    print("Route successfully deleted from server")
+                } else {
+                    print("Failed to delete route from server")
+                }
+            }
+            
+            if let data = data, let dataString = String(data: data, encoding: .utf8) {
+                print("Response data: \(dataString)")
+            }
+        }.resume()
+    }
+}
 
 //delegate 프로토콜 채택 및 구현
 extension MainViewController: DepartureModalViewControllerDelegate {
