@@ -138,7 +138,7 @@ class RouteWalkthroughView: UIScrollView {
         
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.lineHeightMultiple = 1.04
-        label.attributedText = NSAttributedString(string: "한동대학교 산학협력관", attributes: [.paragraphStyle: paragraphStyle])
+        label.attributedText = NSAttributedString(string: "서대구역(남측)2", attributes: [.paragraphStyle: paragraphStyle])
         
         return label
     }()
@@ -158,6 +158,43 @@ class RouteWalkthroughView: UIScrollView {
         
         return label
     }()
+    
+    private let firstWalkDistanceLabel: UILabel = {
+        let label = UILabel()
+        label.frame = CGRect(x: 0, y: 0, width: 46, height: 10)
+        label.textColor = UIColor(red: 0.582, green: 0.582, blue: 0.582, alpha: 1)
+        label.font = UIFont(name: "NanumSquareNeo-Bold", size: 15)
+        let paragraphStyle = NSMutableParagraphStyle()
+        label.attributedText = NSMutableAttributedString(string: "", attributes: [.kern: -0.3, .paragraphStyle: paragraphStyle])
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+
+    private let lastWalkDistanceLabel: UILabel = {
+        let label = UILabel()
+        label.frame = CGRect(x: 0, y: 0, width: 46, height: 10)
+        label.textColor = UIColor(red: 0.582, green: 0.582, blue: 0.582, alpha: 1)
+        label.font = UIFont(name: "NanumSquareNeo-Bold", size: 15)
+        let paragraphStyle = NSMutableParagraphStyle()
+        label.attributedText = NSMutableAttributedString(string: "", attributes: [.kern: -0.3, .paragraphStyle: paragraphStyle])
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+
+    private let firstWheelWalkImage: UIImageView = {
+        let imageView = UIImageView(image: UIImage(named: "WheelDistance"))
+        imageView.contentMode = .scaleAspectFit
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }()
+
+    private let lastWheelWalkImage: UIImageView = {
+        let imageView = UIImageView(image: UIImage(named: "WheelDistance"))
+        imageView.contentMode = .scaleAspectFit
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }()
+
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -202,6 +239,10 @@ class RouteWalkthroughView: UIScrollView {
         contentView.addSubview(finishImage)
         contentView.addSubview(destinationLabel)
         contentView.addSubview(busArrivalInfoLabel)
+        contentView.addSubview(firstWheelWalkImage)
+        contentView.addSubview(firstWalkDistanceLabel)
+        contentView.addSubview(lastWheelWalkImage)
+        contentView.addSubview(lastWalkDistanceLabel)
         
         NSLayoutConstraint.activate([
             totalTimeLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 28),
@@ -267,7 +308,23 @@ class RouteWalkthroughView: UIScrollView {
             busArrivalInfoLabel.topAnchor.constraint(equalTo: busNumImage.bottomAnchor, constant: 13.7),
             busArrivalInfoLabel.leadingAnchor.constraint(equalTo: busNumImage.leadingAnchor),
             
-            contentView.bottomAnchor.constraint(equalTo: finishImage.bottomAnchor, constant: 20)
+            contentView.bottomAnchor.constraint(equalTo: finishImage.bottomAnchor, constant: 20),
+            
+            firstWheelWalkImage.centerYAnchor.constraint(equalTo: grayDottedLine.centerYAnchor),
+            firstWheelWalkImage.leadingAnchor.constraint(equalTo: grayDottedLine.trailingAnchor, constant: 23),
+            firstWheelWalkImage.widthAnchor.constraint(equalToConstant: 14.6),
+            firstWheelWalkImage.heightAnchor.constraint(equalToConstant: 12),
+
+            firstWalkDistanceLabel.centerYAnchor.constraint(equalTo: grayDottedLine.centerYAnchor),
+            firstWalkDistanceLabel.leadingAnchor.constraint(equalTo: firstWheelWalkImage.trailingAnchor, constant: 6.4),
+
+            lastWheelWalkImage.centerYAnchor.constraint(equalTo: secondGrayDottedLine.centerYAnchor),
+            lastWheelWalkImage.leadingAnchor.constraint(equalTo: secondGrayDottedLine.trailingAnchor, constant: 23),
+            lastWheelWalkImage.widthAnchor.constraint(equalToConstant: 14.6),
+            lastWheelWalkImage.heightAnchor.constraint(equalToConstant: 12),
+
+            lastWalkDistanceLabel.centerYAnchor.constraint(equalTo: secondGrayDottedLine.centerYAnchor),
+            lastWalkDistanceLabel.leadingAnchor.constraint(equalTo: lastWheelWalkImage.trailingAnchor, constant: 6.4),
         ])
         
         setupRouteView()
@@ -478,6 +535,14 @@ class RouteWalkthroughView: UIScrollView {
         if let durationLabel = segment.subviews.first(where: { $0 is UILabel }) as? UILabel {
             durationLabel.text = "\(time)분"
         }
+    }
+    
+    func updateWalkDistances(firstWalkDistance: Double, lastWalkDistance: Double) {
+        let firstDistanceText = String(format: "%.0fm", firstWalkDistance)
+        let lastDistanceText = String(format: "%.0fm", lastWalkDistance)
+
+        firstWalkDistanceLabel.text = firstDistanceText
+        lastWalkDistanceLabel.text = lastDistanceText
     }
     
     func setupRouteInfo(totalTime: Int, wheelWalkTime: Int, firstWalkTime: Int, busTime: Int, finalWalkTime: Int, busNumber: String) {
