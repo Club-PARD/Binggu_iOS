@@ -31,7 +31,6 @@
 		8179B2342C5D755E005D8BE7 /* ArriveModalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8179B2332C5D755E005D8BE7 /* ArriveModalViewController.swift */; };
 		8179B2362C5DFF27005D8BE7 /* FrequentRouteCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8179B2352C5DFF27005D8BE7 /* FrequentRouteCell.swift */; };
 		8179B2382C5E0F8E005D8BE7 /* EditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8179B2372C5E0F8E005D8BE7 /* EditViewController.swift */; };
-		8179B23A2C5E733A005D8BE7 /* AddressTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8179B2392C5E733A005D8BE7 /* AddressTableViewCell.swift */; };
 		8179B23C2C5F53D3005D8BE7 /* FrequentEditCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8179B23B2C5F53D3005D8BE7 /* FrequentEditCell.swift */; };
 		8179B23E2C5F7CEB005D8BE7 /* RouteRecommendCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8179B23D2C5F7CEB005D8BE7 /* RouteRecommendCell.swift */; };
 		8179B2452C5FB582005D8BE7 /* NotoSansKR-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 8179B23F2C5FB582005D8BE7 /* NotoSansKR-Medium.otf */; };
@@ -40,6 +39,7 @@
 		8179B2482C5FB582005D8BE7 /* NotoSansKR-Thin.otf in Resources */ = {isa = PBXBuildFile; fileRef = 8179B2422C5FB582005D8BE7 /* NotoSansKR-Thin.otf */; };
 		8179B2492C5FB582005D8BE7 /* NotoSansKR-Black.otf in Resources */ = {isa = PBXBuildFile; fileRef = 8179B2432C5FB582005D8BE7 /* NotoSansKR-Black.otf */; };
 		8179B24A2C5FB582005D8BE7 /* NotoSansKR-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 8179B2442C5FB582005D8BE7 /* NotoSansKR-Bold.otf */; };
+		8179B24C2C60C6BC005D8BE7 /* AddressTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8179B24B2C60C6BC005D8BE7 /* AddressTableViewCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -88,7 +88,6 @@
 		8179B2332C5D755E005D8BE7 /* ArriveModalViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArriveModalViewController.swift; sourceTree = "<group>"; };
 		8179B2352C5DFF27005D8BE7 /* FrequentRouteCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrequentRouteCell.swift; sourceTree = "<group>"; };
 		8179B2372C5E0F8E005D8BE7 /* EditViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditViewController.swift; sourceTree = "<group>"; };
-		8179B2392C5E733A005D8BE7 /* AddressTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AddressTableViewCell.swift; path = ../../../../../../.Trash/Binggu_iOS/WheelBus/WheelBus/ViewControllers/main/AddressTableViewCell.swift; sourceTree = "<group>"; };
 		8179B23B2C5F53D3005D8BE7 /* FrequentEditCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrequentEditCell.swift; sourceTree = "<group>"; };
 		8179B23D2C5F7CEB005D8BE7 /* RouteRecommendCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteRecommendCell.swift; sourceTree = "<group>"; };
 		8179B23F2C5FB582005D8BE7 /* NotoSansKR-Medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NotoSansKR-Medium.otf"; sourceTree = "<group>"; };
@@ -97,6 +96,7 @@
 		8179B2422C5FB582005D8BE7 /* NotoSansKR-Thin.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NotoSansKR-Thin.otf"; sourceTree = "<group>"; };
 		8179B2432C5FB582005D8BE7 /* NotoSansKR-Black.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NotoSansKR-Black.otf"; sourceTree = "<group>"; };
 		8179B2442C5FB582005D8BE7 /* NotoSansKR-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NotoSansKR-Bold.otf"; sourceTree = "<group>"; };
+		8179B24B2C60C6BC005D8BE7 /* AddressTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressTableViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -200,8 +200,8 @@
 			isa = PBXGroup;
 			children = (
 				8179B1F32C5CF2E3005D8BE7 /* LoadingViewController.swift */,
+				8179B24B2C60C6BC005D8BE7 /* AddressTableViewCell.swift */,
 				8179B2312C5D2C17005D8BE7 /* DepartureModalViewController.swift */,
-				8179B2392C5E733A005D8BE7 /* AddressTableViewCell.swift */,
 				8179B2332C5D755E005D8BE7 /* ArriveModalViewController.swift */,
 				8179B2352C5DFF27005D8BE7 /* FrequentRouteCell.swift */,
 				8179B23B2C5F53D3005D8BE7 /* FrequentEditCell.swift */,
@@ -375,11 +375,11 @@
 				B31E69272C60913000F828BB /* MapViewController2.swift in Sources */,
 				22BDCFD52C5B727300EF6205 /* MainViewController.swift in Sources */,
 				22BDCFD12C5B727300EF6205 /* AppDelegate.swift in Sources */,
-				8179B23A2C5E733A005D8BE7 /* AddressTableViewCell.swift in Sources */,
 				8179B2302C5D170C005D8BE7 /* UIFont.swift in Sources */,
 				8179B2362C5DFF27005D8BE7 /* FrequentRouteCell.swift in Sources */,
 				8179B2322C5D2C17005D8BE7 /* DepartureModalViewController.swift in Sources */,
 				8179B23C2C5F53D3005D8BE7 /* FrequentEditCell.swift in Sources */,
+				8179B24C2C60C6BC005D8BE7 /* AddressTableViewCell.swift in Sources */,
 				8179B2342C5D755E005D8BE7 /* ArriveModalViewController.swift in Sources */,
 				8179B23E2C5F7CEB005D8BE7 /* RouteRecommendCell.swift in Sources */,
 				22BDCFD32C5B727300EF6205 /* SceneDelegate.swift in Sources */,
