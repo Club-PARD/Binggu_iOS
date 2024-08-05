@@ -230,6 +230,7 @@ class MapViewController2: UIViewController, CLLocationManagerDelegate, MKMapView
     @objc private func mapBackButtonTapped() {
         // 아직 구현되지 않은 전 페이지로 이동하는 로직
         print("Map back button tapped")
+        self.dismiss(animated: true, completion: nil)
     }
     
     private func setupRouteWalkthroughView() {

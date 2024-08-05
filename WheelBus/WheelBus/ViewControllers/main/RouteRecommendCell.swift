@@ -535,8 +535,3 @@ class RouteRecommendCell: UITableViewCell {
         currentRouteId = nil
     }
 }
-
-enum RouteSegmentType {
-    case walk
-    case bus
-}
