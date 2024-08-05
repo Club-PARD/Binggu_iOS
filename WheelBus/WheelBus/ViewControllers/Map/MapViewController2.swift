@@ -155,7 +155,7 @@ class MapViewController2: UIViewController, CLLocationManagerDelegate, MKMapView
             self.getRouteAndStationXY(forStation: selectedStation.stationId, destLatitude: self.destinationCoordinate.latitude, destLongitude: self.destinationCoordinate.longitude)
         }
     }
-
+    
     private func getRouteAndStationXY(forStation stationId: String, destLatitude: Double, destLongitude: Double) {
         NetworkManager.shared.getRouteNumbers(forStation: stationId, destLatitude: destLatitude, destLongitude: destLongitude) { [weak self] routeNumbers in
             guard let self = self, let routeNumbers = routeNumbers else { return }
@@ -423,13 +423,5 @@ class MapViewController2: UIViewController, CLLocationManagerDelegate, MKMapView
         let busSpeedKmPerHour = 140.0
         let timeInHours = distance / (busSpeedKmPerHour * 1000)
         return Int(ceil(timeInHours * 60))
-    }
-}
-
-extension CLLocationCoordinate2D {
-    func distance(to coordinate: CLLocationCoordinate2D) -> CLLocationDistance {
-        let from = CLLocation(latitude: self.latitude, longitude: self.longitude)
-        let to = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
-        return from.distance(from: to)
     }
 }

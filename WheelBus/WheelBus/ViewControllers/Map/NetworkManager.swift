@@ -40,17 +40,35 @@ class NetworkManager {
         let body: [String: Any] = ["latitude": latitude, "longtitude": longitude]
         request.httpBody = try? JSONSerialization.data(withJSONObject: body)
         
+        print("NetworkManager: Sending request to \(url)")
+        
         URLSession.shared.dataTask(with: request) { data, response, error in
-            guard let data = data, error == nil else {
+            if let error = error {
+                print("NetworkManager: Network error: \(error.localizedDescription)")
+                completion(nil)
+                return
+            }
+            
+            if let httpResponse = response as? HTTPURLResponse {
+                print("NetworkManager: Received response with status code: \(httpResponse.statusCode)")
+            }
+            
+            guard let data = data else {
+                print("NetworkManager: No data received")
                 completion(nil)
                 return
             }
             
             do {
+                if let jsonResult = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                    print("NetworkManager: Received JSON: \(jsonResult)")
+                }
+                
                 let stations = try JSONDecoder().decode([BusStation].self, from: data)
+                print("NetworkManager: Successfully decoded \(stations.count) stations")
                 completion(stations)
             } catch {
-                print("Decoding error: \(error)")
+                print("NetworkManager: Decoding error: \(error)")
                 completion(nil)
             }
         }.resume()

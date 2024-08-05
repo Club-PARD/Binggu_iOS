@@ -9,7 +9,9 @@ import UIKit
 
 class LoadingViewController: UIViewController {
     var userId: Int64?
-
+    private var isCalculationCompleted = false
+    private var isTimerExpired = false
+    
     func fetchUserId() {
            guard let url = URL(string: "http://ec2-3-34-193-237.ap-northeast-2.compute.amazonaws.com:8080/user") else {
                print("Invalid URL")
@@ -121,7 +123,7 @@ class LoadingViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = #colorLiteral(red: 0, green: 0.4780646563, blue: 0.9985368848, alpha: 1)
        
-    // 캐시된 사용자 ID를 로드
+        // 캐시된 사용자 ID를 로드
         if let cachedUserId = UserDefaults.standard.value(forKey: "userId") as? Int64 {
             self.userId = cachedUserId
             print("Cached User ID: \(cachedUserId)")
@@ -130,14 +132,39 @@ class LoadingViewController: UIViewController {
         }
         
         setfunc()
-        print("\(userId)")
+        print("\(String(describing: userId))")
         
-        // 3초 후에 MainViewController로 전환
+        NotificationCenter.default.addObserver(self, selector: #selector(calculationsCompleted), name: Notification.Name("CalculationsCompleted"), object: nil)
+        
+        // 3초 후에 타이머 만료 처리
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-            let mainVC = MainViewController()
-            mainVC.userId = self.userId
-            mainVC.modalPresentationStyle = .fullScreen
-            self.present(mainVC, animated: true, completion: nil)
+            self.isTimerExpired = true
+            self.checkTransition()
         }
+    }
+    
+    @objc private func calculationsCompleted() {
+        isCalculationCompleted = true
+        checkTransition()
+    }
+    
+    private func checkTransition() {
+        DispatchQueue.main.async {
+            if self.isCalculationCompleted && self.isTimerExpired {
+                if let sceneDelegate = UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate,
+                   let window = sceneDelegate.window {
+                    let mainVC = MainViewController()
+                    mainVC.userId = self.userId
+                    window.rootViewController = mainVC
+                    window.makeKeyAndVisible()
+                } else {
+                    print("Failed to get SceneDelegate or window")
+                }
+            }
+        }
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 }
