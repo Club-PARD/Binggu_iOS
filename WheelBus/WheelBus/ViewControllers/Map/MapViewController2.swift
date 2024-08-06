@@ -4,6 +4,7 @@ import CoreLocation
 
 class MapViewController2: UIViewController, CLLocationManagerDelegate, MKMapViewDelegate {
     
+
     private let startCoordinate = CLLocationCoordinate2D(latitude: 35.8571043, longitude: 128.5483635)
     private let destinationCoordinate = CLLocationCoordinate2D(latitude: 35.8411705, longitude: 128.6815273)
     private let preferredStationId = "DGB7041024200"
@@ -13,6 +14,9 @@ class MapViewController2: UIViewController, CLLocationManagerDelegate, MKMapView
     private var currentLocationButton: UIButton!
     private var shouldUpdateUserLocation = false
     private var userTrackingButton: MKUserTrackingButton!
+    private var stationId: String?
+    private var routeId: String?
+    var destinationName: String?
     
     private let mapView: MKMapView = {
         let map = MKMapView()
@@ -147,6 +151,8 @@ class MapViewController2: UIViewController, CLLocationManagerDelegate, MKMapView
             let preferredStation = stations.first { $0.stationId == self.preferredStationId }
             let selectedStation = preferredStation ?? stations[4]
             
+            self.stationId = selectedStation.stationId  // 여기서 stationId 설정
+            
             DispatchQueue.main.async {
                 self.routeWalkthroughView.updateBusStopName(selectedStation.stationName)
                 self.routeWalkthroughView.setContentVisible(true)
@@ -163,6 +169,8 @@ class MapViewController2: UIViewController, CLLocationManagerDelegate, MKMapView
             let selectedRouteId = routeNumbers.first { $0 == self.preferredRouteId } ?? routeNumbers.first
             
             guard let routeId = selectedRouteId else { return }
+            
+            self.routeId = routeId
             
             NetworkManager.shared.getStationXY(stationId: stationId, routeId: routeId) { stationXY in
                 guard let stationXY = stationXY else { return }
@@ -242,7 +250,9 @@ class MapViewController2: UIViewController, CLLocationManagerDelegate, MKMapView
             routeWalkthroughView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             routeWalkthroughView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
-        
+        if let destinationName = destinationName {
+            routeWalkthroughView.updateDestination(destinationName)
+        }
         routeWalkthroughView.setContentVisible(false)
     }
     
@@ -260,11 +270,14 @@ class MapViewController2: UIViewController, CLLocationManagerDelegate, MKMapView
 
         mapView.removeOverlays(mapView.overlays)
         
+        // 출발지에서 50m 떨어진 지점 계산
+        let closestStartPoint = getClosestPointToStart(from: startCoordinate)
+        
         // Add annotation for the first bus stop
         addAnnotation(coordinate: firstStationCoordinate, title: "BusStop")
 
         let walkRequest = MKDirections.Request()
-        walkRequest.source = MKMapItem(placemark: MKPlacemark(coordinate: startCoordinate))
+        walkRequest.source = MKMapItem(placemark: MKPlacemark(coordinate: closestStartPoint))
         walkRequest.destination = MKMapItem(placemark: MKPlacemark(coordinate: firstStationCoordinate))
         walkRequest.transportType = .walking
 
@@ -332,7 +345,9 @@ class MapViewController2: UIViewController, CLLocationManagerDelegate, MKMapView
                             firstWalkTime: firstWalkTime,
                             busTime: busTime,
                             finalWalkTime: finalWalkTime,
-                            busNumber: self.busNumber ?? ""
+                            busNumber: self.busNumber ?? "",
+                            stationId: self.stationId ?? "",
+                            routeId: self.routeId ?? ""
                         )
                     }
 
@@ -346,6 +361,18 @@ class MapViewController2: UIViewController, CLLocationManagerDelegate, MKMapView
                 }
             }
         }
+    }
+    
+    // 출발지에서 가장 가까운 지점 계산
+    private func getClosestPointToStart(from coordinate: CLLocationCoordinate2D) -> CLLocationCoordinate2D {
+        let angle: Double = 0.0
+        let distance: Double = 50.0
+        let earthRadius: Double = 6371000.0
+
+        let newLatitude = coordinate.latitude + (distance / earthRadius) * (180 / .pi)
+        let newLongitude = coordinate.longitude + (distance / earthRadius) * (180 / .pi) / cos(coordinate.latitude * .pi / 180)
+
+        return CLLocationCoordinate2D(latitude: newLatitude, longitude: newLongitude)
     }
     
     // 목적지와 가장 가까운 지점 계산

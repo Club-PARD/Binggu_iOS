@@ -3,6 +3,10 @@ import UIKit
 class RouteWalkthroughView: UIScrollView {
     private let contentView = UIView()
     private let minSegmentWidth: CGFloat = 40
+    private var updateTimer: Timer?
+    private var currentStationId: String?
+    private var currentRouteId: String?
+
     
     private let totalTimeLabel: UILabel = {
         let label = UILabel()
@@ -138,7 +142,7 @@ class RouteWalkthroughView: UIScrollView {
         
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.lineHeightMultiple = 1.04
-        label.attributedText = NSAttributedString(string: "서대구역(남측)2", attributes: [.paragraphStyle: paragraphStyle])
+        label.attributedText = NSAttributedString(string: "", attributes: [.paragraphStyle: paragraphStyle])
         
         return label
     }()
@@ -147,15 +151,8 @@ class RouteWalkthroughView: UIScrollView {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = UIColor(red: 0.78, green: 0.78, blue: 0.78, alpha: 1)
-        label.font = UIFont(name: "NanumSquareNeo-Bold", size: 15)
-        
-        let paragraphStyle = NSMutableParagraphStyle()
-        
-        label.attributedText = NSAttributedString(string: "도착 예정 정보없음", attributes: [
-            .kern: -0.3,
-            .paragraphStyle: paragraphStyle
-        ])
-        
+        label.font = UIFont.nanumSquareNeo(.bold, size: 15)
+        label.text = "도착 예정 정보없음"
         return label
     }()
     
@@ -333,6 +330,42 @@ class RouteWalkthroughView: UIScrollView {
         updateDottedLinePath(for: secondGrayDottedLine)
     }
     
+    func fetchBusArrivalInfo(stationId: String, routeId: String) {
+        if stationId != currentStationId || routeId != currentRouteId {
+            updateTimer?.invalidate()
+            currentStationId = stationId
+            currentRouteId = routeId
+            
+            updateTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
+                self?.fetchBusArrivalInfoFromServer()
+            }
+        }
+        
+        fetchBusArrivalInfoFromServer()
+    }
+    
+    private func fetchBusArrivalInfoFromServer() {
+        guard let stationId = currentStationId, let routeId = currentRouteId else { return }
+        
+        NetworkManager.shared.getBusArrivalTime(stationId: stationId, routeId: routeId) { [weak self] arrivalMin in
+            guard let self = self else { return }
+            
+            DispatchQueue.main.async {
+                if let arrivalMin = arrivalMin {
+                    if arrivalMin == 0 {
+                        self.busArrivalInfoLabel.text = "곧 도착"
+                    } else {
+                        self.busArrivalInfoLabel.text = "\(arrivalMin)분 후 도착예정"
+                    }
+                    self.busArrivalInfoLabel.textColor = .red
+                } else {
+                    self.busArrivalInfoLabel.text = "도착 예정 정보없음"
+                    self.busArrivalInfoLabel.textColor = UIColor(red: 0.78, green: 0.78, blue: 0.78, alpha: 1)
+                }
+            }
+        }
+    }
+    
     private func updateDottedLinePath(for view: UIView) {
         if let shapeLayer = view.layer.sublayers?.first as? CAShapeLayer {
             let path = CGMutablePath()
@@ -365,6 +398,24 @@ class RouteWalkthroughView: UIScrollView {
             routeStackView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
             routeStackView.trailingAnchor.constraint(equalTo: container.trailingAnchor)
         ])
+    }
+    
+    func updateBusArrivalInfo(stationId: String, routeId: String) {
+        NetworkManager.shared.getBusArrivalTime(stationId: stationId, routeId: routeId) { [weak self] arrivalMin in
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                if let arrivalMin = arrivalMin {
+                    if arrivalMin == 0 {
+                        self.busArrivalInfoLabel.text = "곧 도착"
+                    } else {
+                        self.busArrivalInfoLabel.text = "\(arrivalMin)분 후 도착 예정"
+                        self.busArrivalInfoLabel.textColor = .red
+                    }
+                } else {
+                    self.busArrivalInfoLabel.text = "도착 예정 정보없음"
+                }
+            }
+        }
     }
 
     private func setupRouteSegments(firstWalkTime: Int, busTime: Int, finalWalkTime: Int) {
@@ -511,9 +562,7 @@ class RouteWalkthroughView: UIScrollView {
     }
     
     func updateDestination(_ destination: String) {
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.lineHeightMultiple = 1.04
-        destinationLabel.attributedText = NSAttributedString(string: destination, attributes: [.paragraphStyle: paragraphStyle])
+        destinationLabel.text = destination
     }
     
     func updateRouteSegments(firstWalkTime: Int, busTime: Int, finalWalkTime: Int) {
@@ -545,13 +594,15 @@ class RouteWalkthroughView: UIScrollView {
         lastWalkDistanceLabel.text = lastDistanceText
     }
     
-    func setupRouteInfo(totalTime: Int, wheelWalkTime: Int, firstWalkTime: Int, busTime: Int, finalWalkTime: Int, busNumber: String) {
+    func setupRouteInfo(totalTime: Int, wheelWalkTime: Int, firstWalkTime: Int, busTime: Int, finalWalkTime: Int, busNumber: String, stationId: String, routeId: String) {
         updateTotalTime(totalTime)
         updateWheelWalkTime(wheelWalkTime)
         setupRouteSegments(firstWalkTime: firstWalkTime, busTime: busTime, finalWalkTime: finalWalkTime)
         updateBusNumber(busNumber)
+        updateBusArrivalInfo(stationId: stationId, routeId: routeId)
         setContentVisible(true)
     }
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         updateDottedLinePath(for: grayDottedLine)

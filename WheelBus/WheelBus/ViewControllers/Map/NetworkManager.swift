@@ -183,4 +183,38 @@ class NetworkManager {
             }
         }.resume()
     }
+    
+    func getBusArrivalTime(stationId: String, routeId: String, completion: @escaping (Int?) -> Void) {
+        let url = URL(string: "\(baseURL)/bus/arrivalTime")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let body: [String: Any] = ["stationId": stationId, "routeId": routeId]
+        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 404 {
+                completion(nil)
+                return
+            }
+            
+            guard let data = data, error == nil else {
+                completion(nil)
+                return
+            }
+            
+            do {
+                if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
+                   let arrivalMin = json["arrivalMin"] as? Int {
+                    completion(arrivalMin)
+                } else {
+                    completion(nil)
+                }
+            } catch {
+                print("Decoding error: \(error)")
+                completion(nil)
+            }
+        }.resume()
+    }
 }
