@@ -509,7 +509,7 @@ class RouteRecommendCell: UITableViewCell {
         setContentVisible(true)
     }
     
-    func configure(totalTime: Int, wheelWalkTime: Int, firstWalkTime: Int, busTime: Int, finalWalkTime: Int, busNumber: Int, startBusStop: String, endBusStop: String, stationId: String, routeId: String) {
+    func configure(userId: Int, totalTime: Int, wheelWalkTime: Int, firstWalkTime: Int, busTime: Int, finalWalkTime: Int, busNumber: Int, startBusStop: String, endBusStop: String, stationId: String, routeId: String) {
         updateTotalTime(totalTime)
         updateWheelWalkTime(wheelWalkTime)
         setupRouteSegments(firstWalkTime: firstWalkTime, busTime: busTime, finalWalkTime: finalWalkTime)
@@ -520,6 +520,8 @@ class RouteRecommendCell: UITableViewCell {
         self.routeId = busNumber
         self.startStation = startBusStop
         self.endStation = endBusStop
+        
+        checkRoutineStatus(userId: userId, routeId: busNumber)
     }
     override func layoutSubviews() {
         super.layoutSubviews()
@@ -534,4 +536,41 @@ class RouteRecommendCell: UITableViewCell {
         currentStationId = nil
         currentRouteId = nil
     }
+    
+    func checkRoutineStatus(userId: Int, routeId: Int) {
+        let urlString = "http://ec2-3-34-193-237.ap-northeast-2.compute.amazonaws.com:8080/user/\(userId)/\(routeId)"
+        guard let url = URL(string: urlString) else { return }
+        
+        URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
+            guard let self = self else { return }
+            
+            if let error = error {
+                print("Error: \(error.localizedDescription)")
+                return
+            }
+            
+            guard let data = data else {
+                print("No data received")
+                return
+            }
+            
+            do {
+                if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Bool],
+                   let isRegistered = json["register"] {
+                    DispatchQueue.main.async {
+                        self.addRoutineButton.isSelected = isRegistered
+                    }
+                }
+            } catch {
+                print("Error parsing JSON: \(error.localizedDescription)")
+            }
+        }.resume()
+    }
+    
+    
+    
+    
+    
+    
+    
 }

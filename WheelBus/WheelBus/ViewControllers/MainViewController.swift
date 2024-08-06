@@ -9,14 +9,14 @@ import UIKit
 import CoreLocation
 
 class MainViewController: UIViewController, EditViewControllerDelegate {
-    var userId: Int64?
+    var userId: Int?
     
     var frequentRoutes: [FrequentRoute] = []
     
     var departurePlaceholder = "출발지 입력"
     var arrivePlaceholder = "도착지 입력"
-    var departureValue: String?
-    var arriveValue: String?
+    var departureValue: String?     //출발지
+    var arriveValue: String?        //도착지
     
     var departureLat: Float = 0.0
     var departureLon: Float = 0.0
@@ -113,6 +113,9 @@ class MainViewController: UIViewController, EditViewControllerDelegate {
             self.menuView.removeFromSuperview()
         }
     }
+    var searchnum: Int = 0
+    
+    var routeData: [(Int, Int, Int, Int, Int, Int, String, String, String, String)] = []
     
     func convertAddressToCoordinates(address: String, isArrival: Bool) {
         let geocoder = CLGeocoder()
@@ -445,6 +448,7 @@ class MainViewController: UIViewController, EditViewControllerDelegate {
             departureLabel.text = value
             departureLabel.font = UIFont.nanumSquareNeo(.bold, size: 18)
             departureLabel.textColor = .black
+            print("출발지: \(value)")
         } else {
             departureLabel.text = departurePlaceholder
             departureLabel.font = UIFont.nanumSquareNeo(.regular, size: 22)
@@ -459,6 +463,7 @@ class MainViewController: UIViewController, EditViewControllerDelegate {
             arriveLabel.text = value
             arriveLabel.font = UIFont.nanumSquareNeo(.bold, size: 18)
             arriveLabel.textColor = .black
+            print("도착지: \(value)")
         } else {
             arriveLabel.text = arrivePlaceholder
             arriveLabel.font = UIFont.nanumSquareNeo(.regular, size: 22)
@@ -479,6 +484,27 @@ class MainViewController: UIViewController, EditViewControllerDelegate {
             
             //여기서 위도, 경도 전송도 해주면 되겠다.
             
+            guard let departureValue = departureValue else {
+                print("Departure value is nil")
+                // departureValue가 nil일 때의 적절한 처리
+                // 예를 들어, 기본값 설정 또는 함수/메서드 종료
+                searchnum = 0 // 또는 다른 적절한 기본값
+                return
+            }
+            
+            
+            let commaIndex = departureValue.firstIndex(of: ",") ?? departureValue.endIndex
+            let searchTerm = String(departureValue[..<commaIndex]).trimmingCharacters(in: .whitespacesAndNewlines)
+              
+            if searchTerm == "경북대학교" {
+                searchnum = 0
+            } else if searchTerm == "대구과학기술고등학교" {
+                searchnum = 1
+            } else {searchnum = 2}
+            
+            // searchnum이 변경되었으므로 routeData를 업데이트하고 테이블 뷰를 리로드합니다.
+            setupRouteData()
+            recommendedRouteTableView.reloadData()
             
         } else {
             recommendedRouteView.isHidden = true
@@ -640,15 +666,6 @@ class MainViewController: UIViewController, EditViewControllerDelegate {
             self.addall2 = 0 // 또는 다른 기본값
         }
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
         //            // 값이 할당된 후 필요한 작업 수행
         //            print("All calculations completed and values assigned")
         //            logAllVariables()
@@ -681,6 +698,8 @@ class MainViewController: UIViewController, EditViewControllerDelegate {
         
         let arriveTapGesture = UITapGestureRecognizer(target: self, action: #selector(arriveLabelTapped))
         arriveLabel.addGestureRecognizer(arriveTapGesture)
+        
+        setupRouteData()
     }
     
     let resetButton: UIButton = {
@@ -849,6 +868,35 @@ class MainViewController: UIViewController, EditViewControllerDelegate {
         emptyStateView.isHidden = !frequentRoutes.isEmpty
         collectionView.isHidden = frequentRoutes.isEmpty
     }
+    
+    func setupRouteData() {
+        routeData.removeAll()
+
+          switch searchnum {
+          case 0:
+              if let addall1 = addall1, let walkadd1 = walkadd1, let walkTime1Route1 = walkTime1Route1,
+                 let busTimeRoute1 = busTimeRoute1, let walkTime2Route1 = walkTime2Route1,
+                 let busNumRoute1 = busNumRoute1, let firstStationRoute1 = firstStationRoute1,
+                 let finalStationRoute1 = finalStationRoute1 {
+                  routeData.append((addall1, walkadd1, walkTime1Route1, busTimeRoute1, walkTime2Route1, busNumRoute1, firstStationRoute1, finalStationRoute1, stationId, routeId))
+              }
+          case 1:
+              if let addall2 = addall2, let walkadd2 = walkadd2, let walkTime1Route2 = walkTime1Route2,
+                 let busTimeRoute2 = busTimeRoute2, let walkTime2Route2 = walkTime2Route2,
+                 let busNumRoute2 = busNumRoute2, let firstStationRoute2 = firstStationRoute2,
+                 let finalStationRoute2 = finalStationRoute2 {
+                  routeData.append((addall2, walkadd2, walkTime1Route2, busTimeRoute2, walkTime2Route2, busNumRoute2, firstStationRoute2, finalStationRoute2, stationId2, routeId2))
+              }
+          default:
+              print("Invalid searchnum value")
+          }
+        
+        // 더미 데이터 추가
+        routeData.append((50, 20, 10, 30, 10, 939, "만촌네거리1", "대구한일극장", "DGB7041024200", "DGB3000509000"))
+        routeData.append((73, 18, 10, 55, 8, 456, "우방청솔맨션건너", "관경관앞", "DGB7011010100", "DGB3000503000"))
+    }
+
+
 }
 
 // 즐겨찾기 collectionview관리
@@ -887,7 +935,7 @@ extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSour
         return 12 // 가로 간격
     }
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        switch indexPath.row {
+        switch indexPath.count {
         case 0:
             let mainVC = MapViewController()
             mainVC.modalPresentationStyle = .fullScreen
@@ -904,63 +952,38 @@ extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSour
 // 출발, 도착 값 있을 떄 따는 tableview 관리
 extension MainViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 2 // 예시로 5개의 셀을 표시
+        return routeData.count
     }
-    
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "RouteRecommendCell", for: indexPath) as? RouteRecommendCell else {
             fatalError("Unable to dequeue RouteRecommendCell")
         }
+        
         cell.backgroundColor = #colorLiteral(red: 0.9750779271, green: 0.9750778079, blue: 0.9750779271, alpha: 1)
         cell.selectionStyle = .none
-        
         cell.delegate = self
-        print("Cell delegate set")  // 디버깅 메시지 추가
         
-        // 여기에서 각 셀에 대한 데이터를 설정합니다.
-        switch indexPath.row {
-        case 0:
-            cell.configure(totalTime: addall1!,
-                           wheelWalkTime: walkadd1!,
-                           firstWalkTime: walkTime1Route1!,
-                           busTime: busTimeRoute1!,
-                           finalWalkTime: walkTime2Route1!,
-                           busNumber: busNumRoute1!,
-                           startBusStop: firstStationRoute1!,
-                           endBusStop: finalStationRoute1!,
-                           stationId: self.stationId,
-                           routeId: self.routeId)
-        case 1:
-            cell.configure(totalTime: addall2!,
-                           wheelWalkTime: walkadd2!,
-                           firstWalkTime: walkTime1Route2!,
-                           busTime: busTimeRoute2!,
-                           finalWalkTime: walkTime2Route2!,
-                               busNumber: busNumRoute2!,
-                               startBusStop: firstStationRoute2!,
-                               endBusStop: finalStationRoute2!,
-                               stationId: self.stationId2,
-                               routeId: self.routeId2)
-            default:
-                // 기본 데이터 설정 (필요한 경우)
-                cell.configure(totalTime: 0,
-                               wheelWalkTime: 0,
-                               firstWalkTime: 0,
-                               busTime: 0,
-                               finalWalkTime: 0,
-                               busNumber: 0,
-                               startBusStop: "",
-                               endBusStop: "",
-                               stationId: "",
-                               routeId: "")
-            }
+        let route = routeData[indexPath.row]
+        cell.configure(userId: self.userId!,
+                       totalTime: route.0,
+                       wheelWalkTime: route.1,
+                       firstWalkTime: route.2,
+                       busTime: route.3,
+                       finalWalkTime: route.4,
+                       busNumber: route.5,
+                       startBusStop: route.6,
+                       endBusStop: route.7,
+                       stationId: route.8,
+                       routeId: route.9)
+        
         return cell
     }
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 280
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        switch indexPath.row {
+        switch searchnum {
         case 0:
             let mainVC = MapViewController()
             mainVC.modalPresentationStyle = .fullScreen

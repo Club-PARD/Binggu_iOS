@@ -8,7 +8,7 @@
 import UIKit
 
 class LoadingViewController: UIViewController {
-    var userId: Int64?
+    var userId: Int?
     private var isCalculationCompleted = false
     private var isTimerExpired = false
     
@@ -37,7 +37,7 @@ class LoadingViewController: UIViewController {
                }
 
                do {
-                   if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Int64],
+                   if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Int],
                       let id = json["id"] {
                        DispatchQueue.main.async {
                            self?.userId = id
@@ -124,7 +124,7 @@ class LoadingViewController: UIViewController {
         view.backgroundColor = #colorLiteral(red: 0, green: 0.4780646563, blue: 0.9985368848, alpha: 1)
        
         // 캐시된 사용자 ID를 로드
-        if let cachedUserId = UserDefaults.standard.value(forKey: "userId") as? Int64 {
+        if let cachedUserId = UserDefaults.standard.value(forKey: "userId") as? Int {
             self.userId = cachedUserId
             print("Cached User ID: \(cachedUserId)")
         } else {
