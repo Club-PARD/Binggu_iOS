@@ -14,7 +14,7 @@ protocol EditViewControllerDelegate: AnyObject {
 class EditViewController: UIViewController {
     weak var delegate: EditViewControllerDelegate?
     var frequentRoutes: [FrequentRoute] = []    //즐겨찾기 값들
-    var userId: Int64?  //uid 받을 변수
+    var userId: Int?  //uid 받을 변수
     var selectedIndexPaths: Set<IndexPath> = [] //셀 선택하고 삭제하기 위해서
     var isAllSelected = false   //전체선택 하기 위해서
     
