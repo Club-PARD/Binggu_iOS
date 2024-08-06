@@ -16,7 +16,7 @@ class MapViewController2: UIViewController, CLLocationManagerDelegate, MKMapView
     private var userTrackingButton: MKUserTrackingButton!
     private var stationId: String?
     private var routeId: String?
-    var destinationName: String?
+    private var destinationName = "대구삼성라이온즈파크"
     
     private let mapView: MKMapView = {
         let map = MKMapView()
@@ -250,9 +250,7 @@ class MapViewController2: UIViewController, CLLocationManagerDelegate, MKMapView
             routeWalkthroughView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             routeWalkthroughView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
-        if let destinationName = destinationName {
-            routeWalkthroughView.updateDestination(destinationName)
-        }
+        routeWalkthroughView.updateDestination(destinationName)
         routeWalkthroughView.setContentVisible(false)
     }
     
@@ -321,7 +319,7 @@ class MapViewController2: UIViewController, CLLocationManagerDelegate, MKMapView
                 // 최종 도보 경로 계산 부분 수정
                 let finalWalkRequest = MKDirections.Request()
                 finalWalkRequest.source = MKMapItem(placemark: MKPlacemark(coordinate: lastStationCoordinate))
-                finalWalkRequest.destination = MKMapItem(placemark: MKPlacemark(coordinate: self.getClosestPointToDestination(from: lastStationCoordinate)))
+                finalWalkRequest.destination = MKMapItem(placemark: MKPlacemark(coordinate: self.destinationCoordinate))
                 finalWalkRequest.transportType = .walking
                 
                 let finalWalkDirections = MKDirections(request: finalWalkRequest)
