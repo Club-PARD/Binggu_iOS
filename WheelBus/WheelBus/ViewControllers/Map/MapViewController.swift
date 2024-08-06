@@ -13,6 +13,9 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
     private var currentLocationButton: UIButton!
     private var shouldUpdateUserLocation = false
     private var userTrackingButton: MKUserTrackingButton!
+    private var stationId: String?
+    private var routeId: String?
+    var destinationName: String?
     
     private let mapView: MKMapView = {
         let map = MKMapView()
@@ -147,6 +150,8 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
             let preferredStation = stations.first { $0.stationId == self.preferredStationId }
             let selectedStation = preferredStation ?? stations[4]
             
+            self.stationId = selectedStation.stationId  // 여기서 stationId 설정
+            
             DispatchQueue.main.async {
                 self.routeWalkthroughView.updateBusStopName(selectedStation.stationName)
                 self.routeWalkthroughView.setContentVisible(true)
@@ -163,6 +168,8 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
             let selectedRouteId = routeNumbers.first { $0 == self.preferredRouteId } ?? routeNumbers.first
             
             guard let routeId = selectedRouteId else { return }
+            
+            self.routeId = routeId
             
             NetworkManager.shared.getStationXY(stationId: stationId, routeId: routeId) { stationXY in
                 guard let stationXY = stationXY else { return }
@@ -242,7 +249,9 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
             routeWalkthroughView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             routeWalkthroughView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
-        
+        if let destinationName = destinationName {
+            routeWalkthroughView.updateDestination(destinationName)
+        }
         routeWalkthroughView.setContentVisible(false)
     }
     
@@ -260,11 +269,14 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
 
         mapView.removeOverlays(mapView.overlays)
         
+        // 출발지에서 50m 떨어진 지점 계산
+        let closestStartPoint = getClosestPointToStart(from: startCoordinate)
+        
         // Add annotation for the first bus stop
         addAnnotation(coordinate: firstStationCoordinate, title: "BusStop")
 
         let walkRequest = MKDirections.Request()
-        walkRequest.source = MKMapItem(placemark: MKPlacemark(coordinate: startCoordinate))
+        walkRequest.source = MKMapItem(placemark: MKPlacemark(coordinate: closestStartPoint))
         walkRequest.destination = MKMapItem(placemark: MKPlacemark(coordinate: firstStationCoordinate))
         walkRequest.transportType = .walking
 
@@ -332,7 +344,9 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
                             firstWalkTime: firstWalkTime,
                             busTime: busTime,
                             finalWalkTime: finalWalkTime,
-                            busNumber: self.busNumber ?? ""
+                            busNumber: self.busNumber ?? "",
+                            stationId: self.stationId ?? "",
+                            routeId: self.routeId ?? ""
                         )
                     }
 
@@ -346,6 +360,18 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
                 }
             }
         }
+    }
+    
+    // 출발지에서 가장 가까운 지점 계산
+    private func getClosestPointToStart(from coordinate: CLLocationCoordinate2D) -> CLLocationCoordinate2D {
+        let angle: Double = 0.0
+        let distance: Double = 50.0
+        let earthRadius: Double = 6371000.0
+
+        let newLatitude = coordinate.latitude + (distance / earthRadius) * (180 / .pi)
+        let newLongitude = coordinate.longitude + (distance / earthRadius) * (180 / .pi) / cos(coordinate.latitude * .pi / 180)
+
+        return CLLocationCoordinate2D(latitude: newLatitude, longitude: newLongitude)
     }
     
     // 목적지와 가장 가까운 지점 계산

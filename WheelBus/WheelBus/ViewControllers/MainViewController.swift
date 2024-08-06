@@ -833,10 +833,12 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
         case 0:
             let mainVC = MapViewController()
             mainVC.modalPresentationStyle = .fullScreen
+            mainVC.destinationName = self.arriveValue
             self.present(mainVC, animated: true, completion: nil)
         case 1:
             let mainVC = MapViewController2()
             mainVC.modalPresentationStyle = .fullScreen
+            mainVC.destinationName = self.arriveValue
             self.present(mainVC, animated: true, completion: nil)
         default:
             break
