@@ -341,10 +341,9 @@ class EditViewController: UIViewController {
             deleteButton.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             deleteButton.heightAnchor.constraint(equalToConstant: 114),
             
-            emptyStateView.topAnchor.constraint(equalTo: editlabel.bottomAnchor),
             emptyStateView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             emptyStateView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            emptyStateView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -133),
+            emptyStateView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -386.17),
             
             emptyStateLabel.topAnchor.constraint(equalTo: emptyStateImageView.bottomAnchor, constant: 19),
             emptyStateLabel.centerXAnchor.constraint(equalTo: emptyStateView.centerXAnchor),
@@ -352,8 +351,9 @@ class EditViewController: UIViewController {
             emptyStateLabel2.topAnchor.constraint(equalTo: emptyStateLabel.bottomAnchor, constant: 10),
             emptyStateLabel2.centerXAnchor.constraint(equalTo: emptyStateView.centerXAnchor),
             
-            emptyStateImageView.bottomAnchor.constraint(equalTo: emptyStateView.bottomAnchor),
+            emptyStateImageView.centerXAnchor.constraint(equalTo: emptyStateView.centerXAnchor),
             emptyStateImageView.heightAnchor.constraint(equalToConstant: 84),
+            emptyStateImageView.widthAnchor.constraint(equalToConstant: 77),
             emptyStateImageView.topAnchor.constraint(equalTo: editlabel.bottomAnchor, constant: 220),
             
             deleteButtonLabel.topAnchor.constraint(equalTo: deleteButton.topAnchor, constant: 19),

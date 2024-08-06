@@ -46,6 +46,73 @@ class MainViewController: UIViewController, EditViewControllerDelegate {
     var addall1: Int?
     var addall2: Int?
     
+    var menuBackgroundView: UIView!
+    var menuView: UIView!
+    var privacyLabel: UILabel!
+    var termsLabel: UILabel!
+    
+    func setupMenuView() {
+        // Setup background view
+        menuBackgroundView = UIView(frame: self.view.bounds)
+        menuBackgroundView.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+        menuBackgroundView.alpha = 0
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(closeMenu))
+        menuBackgroundView.addGestureRecognizer(tapGesture)
+
+        let menuWidth = self.view.frame.width / 1.5
+        menuView = UIView(frame: CGRect(x: self.view.frame.width, y: 0, width: menuWidth, height: self.view.frame.height))
+        menuView.backgroundColor = UIColor.white
+        
+        privacyLabel = createMenuLabel(text: "개인정보처리방침")
+        termsLabel = createMenuLabel(text: "이용약관")
+        
+        menuView.addSubview(privacyLabel)
+        menuView.addSubview(termsLabel)
+        
+        // Layout constraints for labels
+        NSLayoutConstraint.activate([
+            privacyLabel.topAnchor.constraint(equalTo: menuView.topAnchor, constant: 127),
+            privacyLabel.leadingAnchor.constraint(equalTo: menuView.leadingAnchor, constant: 40),
+            
+            termsLabel.topAnchor.constraint(equalTo: privacyLabel.bottomAnchor, constant: 35),
+            termsLabel.leadingAnchor.constraint(equalTo: privacyLabel.leadingAnchor)
+        ])
+        
+        // Add views to main view
+        self.view.addSubview(menuBackgroundView)
+        self.view.addSubview(menuView)
+    }
+
+    func createMenuLabel(text: String) -> UILabel {
+        let label = UILabel()
+        label.frame = CGRect(x: 0, y: 0, width: 122, height: 11)
+        label.textColor = UIColor(red: 0.098, green: 0.098, blue: 0.098, alpha: 1)
+        label.font = UIFont(name: "NanumSquareNeo-Bold", size: 16)
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineHeightMultiple = 0.9
+        label.attributedText = NSMutableAttributedString(string: text, attributes: [NSAttributedString.Key.paragraphStyle: paragraphStyle])
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }
+
+    @objc func menuButtonTapped() {
+        setupMenuView()
+        UIView.animate(withDuration: 0.3) {
+            self.menuBackgroundView.alpha = 1
+            self.menuView.frame.origin.x = self.view.frame.width / 2
+        }
+    }
+
+    @objc func closeMenu() {
+        UIView.animate(withDuration: 0.3, animations: {
+            self.menuBackgroundView.alpha = 0
+            self.menuView.frame.origin.x = self.view.frame.width
+        }) { _ in
+            self.menuBackgroundView.removeFromSuperview()
+            self.menuView.removeFromSuperview()
+        }
+    }
     var searchnum: Int = 0
     
     var routeData: [(Int, Int, Int, Int, Int, Int, String, String, String, String)] = []
@@ -78,7 +145,7 @@ class MainViewController: UIViewController, EditViewControllerDelegate {
             }
         }
     }
-    
+
     let topview : UIView = {
         let top = UIView()
         top.translatesAutoresizingMaskIntoConstraints = false
@@ -99,6 +166,14 @@ class MainViewController: UIViewController, EditViewControllerDelegate {
         imageView.contentMode = .scaleToFill //
         imageView.clipsToBounds = false // 뷰의 경계 벗어나도 괜찮게
         imageView.image = UIImage(named: "main")
+        return imageView
+    }()
+    
+    
+    let menuImage : UIImageView = {
+        let imageView = UIImageView()
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.image = UIImage(named: "Menu")
         return imageView
     }()
     
@@ -379,6 +454,7 @@ class MainViewController: UIViewController, EditViewControllerDelegate {
             departureLabel.font = UIFont.nanumSquareNeo(.regular, size: 22)
             departureLabel.textColor = .lightGray
         }
+        updateResetButtonVisibility()
         updateRecommendedRouteView()
     }
     
@@ -393,6 +469,7 @@ class MainViewController: UIViewController, EditViewControllerDelegate {
             arriveLabel.font = UIFont.nanumSquareNeo(.regular, size: 22)
             arriveLabel.textColor = .lightGray
         }
+        updateResetButtonVisibility()
         updateRecommendedRouteView()
     }
     //출발, 도착 두 값이 모두 있는지 확인해서 있으면 이 함수 실행
@@ -625,6 +702,18 @@ class MainViewController: UIViewController, EditViewControllerDelegate {
         setupRouteData()
     }
     
+    let resetButton: UIButton = {
+        let button = UIButton(type: .custom)
+        button.setImage(UIImage(named: "Reset"), for: .normal)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.alpha = 0
+        button.clipsToBounds = true
+        button.layer.cornerRadius = 12
+        button.layer.maskedCorners = [.layerMaxXMaxYCorner]
+        button.addTarget(self, action: #selector(resetButtonTapped), for: .touchUpInside)
+        return button
+    }()
+    
     func setUI() {
         view.addSubview(topview)
         view.addSubview(bottomview)
@@ -636,7 +725,9 @@ class MainViewController: UIViewController, EditViewControllerDelegate {
         topview.addSubview(logoimage)
         topview.addSubview(titlelabel)
         topview.addSubview(secondtext)
+        topview.addSubview(menuImage)
         searchview.addSubview(changeButton)
+        searchview.addSubview(resetButton)
         bottomview.addSubview(frequentRoutesLabel)
         bottomview.addSubview(collectionView)
         bottomview.addSubview(emptyStateView)
@@ -647,7 +738,7 @@ class MainViewController: UIViewController, EditViewControllerDelegate {
         view.addSubview(recommendedRouteView)
         recommendedRouteView.addSubview(recommendedRouteLabel)
         recommendedRouteView.addSubview(recommendedRouteTableView)
-        
+
         NSLayoutConstraint.activate([
             topview.topAnchor.constraint(equalTo: view.topAnchor),
             topview.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -667,6 +758,11 @@ class MainViewController: UIViewController, EditViewControllerDelegate {
             titlelabel.topAnchor.constraint(equalTo: view.topAnchor, constant: view.frame.height * 0.1),
             titlelabel.leadingAnchor.constraint(equalTo: searchview.leadingAnchor),
             titlelabel.heightAnchor.constraint(equalToConstant: 17),
+            
+            menuImage.widthAnchor.constraint(equalToConstant: 24),
+            menuImage.heightAnchor.constraint(equalToConstant: 24),
+            menuImage.topAnchor.constraint(equalTo: view.topAnchor, constant: 75),
+            menuImage.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -18),
             
             secondtext.leadingAnchor.constraint(equalTo: searchview.leadingAnchor),
             secondtext.heightAnchor.constraint(equalToConstant: 96),
@@ -731,9 +827,43 @@ class MainViewController: UIViewController, EditViewControllerDelegate {
             recommendedRouteTableView.topAnchor.constraint(equalTo: recommendedRouteView.topAnchor, constant: 60),
             recommendedRouteTableView.leadingAnchor.constraint(equalTo: recommendedRouteView.leadingAnchor),
             recommendedRouteTableView.trailingAnchor.constraint(equalTo: recommendedRouteView.trailingAnchor),
-            recommendedRouteTableView.bottomAnchor.constraint(equalTo: recommendedRouteView.bottomAnchor)
+            recommendedRouteTableView.bottomAnchor.constraint(equalTo: recommendedRouteView.bottomAnchor),
+            
+            resetButton.bottomAnchor.constraint(equalTo: searchview.bottomAnchor),
+            resetButton.trailingAnchor.constraint(equalTo: searchview.trailingAnchor),
+            resetButton.widthAnchor.constraint(equalToConstant: 66),
+            resetButton.heightAnchor.constraint(equalToConstant: 30)
         ])
+        let menuTapGesture = UITapGestureRecognizer(target: self, action: #selector(menuButtonTapped))
+        menuImage.isUserInteractionEnabled = true
+        menuImage.addGestureRecognizer(menuTapGesture)
     }
+    
+    @objc func resetButtonTapped() {
+        departureLabel.text = departurePlaceholder
+        arriveLabel.text = arrivePlaceholder
+        departureValue = nil
+        arriveValue = nil
+        updateDepartureLabel()
+        updateArriveLabel()
+        updateResetButtonVisibility()
+        
+        refreshViewController()
+    }
+    
+    func refreshViewController() {
+        // 자주 가는 길 데이터 다시 불러오기
+        fetchFrequentRoutes()
+    }
+    
+    func updateResetButtonVisibility() {
+        let shouldShow = departureValue != nil || arriveValue != nil
+        
+        UIView.animate(withDuration: 0.3) {
+            self.resetButton.alpha = shouldShow ? 1 : 0
+        }
+    }
+    
     func updateEmptyState() {
         emptyStateView.isHidden = !frequentRoutes.isEmpty
         collectionView.isHidden = frequentRoutes.isEmpty
@@ -857,12 +987,10 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
         case 0:
             let mainVC = MapViewController()
             mainVC.modalPresentationStyle = .fullScreen
-            mainVC.destinationName = self.arriveValue
             self.present(mainVC, animated: true, completion: nil)
         case 1:
             let mainVC = MapViewController2()
             mainVC.modalPresentationStyle = .fullScreen
-            mainVC.destinationName = self.arriveValue
             self.present(mainVC, animated: true, completion: nil)
         default:
             break
