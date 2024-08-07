@@ -935,7 +935,7 @@ extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSour
         return 12 // 가로 간격
     }
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        switch indexPath.count {
+        switch frequentRoutes.count {
         case 0:
             let mainVC = MapViewController()
             mainVC.modalPresentationStyle = .fullScreen
